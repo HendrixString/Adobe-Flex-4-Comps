@@ -248,9 +248,10 @@
 				setLayout(_layoutDesc);
 			}
 
-			public function get layoutDesc():String	{
-				return _layoutDesc;
-			}
+			/**
+			 * choose between <code>LAYOUT_HORIZONTAL, LAYOUT_VERTICAL</code>
+			 */ 
+			public function get layoutDesc():String	{	return _layoutDesc;	}
 			public function set layoutDesc(value:String):void	{
 				//trace("set layoutDesc");
 				_layoutDesc = value;
