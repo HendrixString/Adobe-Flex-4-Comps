@@ -1,0 +1,354 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+				 xmlns:s="library://ns.adobe.com/flex/spark" 
+				 xmlns:mx="library://ns.adobe.com/flex/mx"
+				 creationComplete="onCreationCompleteHandler(event)"
+				 width="100%" height="100%">
+
+	<fx:Script>
+		<![CDATA[
+			import mx.events.FlexEvent;
+			
+			private static var SCALE_X:				Number									=	1.4;
+			private static var SCALE_Y:				Number									=	2.0;
+			private static var CP_SIZE:				Number									=	6;
+			
+			private var _firstPoint:					Point					 					= null;
+			private var _controlPoints:				Vector.<Point> 					= null;
+			private var _anchorPoints:				Vector.<Point> 					= null;
+			
+			private var _controlPointsUi:			Vector.<ControlPoint> 	= null;
+			private var _anchorPointsUi:			Vector.<ControlPoint> 	= null;
+			
+			private var _splineShape:					Shape 									= null;
+			
+			private var _boundForDragging:		Rectangle								=	null;
+			private var _boundBox:						Rectangle								=	null;
+
+			private var _bmpIconUp:						BitmapData							=	null;
+			private var _bmpIconDown:					BitmapData							=	null;
+			
+			private var _isCreated:						Boolean									=	false;
+			public var onSplineShapeIsReady:	Function								=	null;
+
+			public function get anchorPoints():											Vector.<Point>	{	return _anchorPoints;	}
+			public function set anchorPoints(value:Vector.<Point>):	void
+			{
+				_anchorPoints = value;
+				redraw();
+			}
+
+			public function get controlPoints():										Vector.<Point>	{	return _controlPoints;	}
+			public function set controlPoints(value:Vector.<Point>):void
+			{
+				_controlPoints = value;
+				redraw();
+			}
+
+			public function get firstPoint():												Point	{	return _firstPoint;	}
+			public function set firstPoint(value:Point):						void
+			{
+				_firstPoint = value;
+				redraw();
+			}
+
+			public function redraw():void
+			{
+				if(_isCreated == false)
+					return;
+				
+				if(_controlPoints == null || _anchorPoints == null || _firstPoint==null)
+					return;
+				
+				scaleSplinePoints(1.4, 2);
+				drawCP();
+				drawSpline();
+			}
+			
+			public function computeBounds():Rectangle
+			{
+				var minX:	Number	=	_anchorPoints[0].x;
+				var maxX:	Number	=	_anchorPoints[0].x;
+				var minY:	Number	=	_anchorPoints[0].y;
+				var maxY:	Number	=	_anchorPoints[0].y;
+				
+				for(var ix:uint = 0; ix < _anchorPoints.length; ix++)
+				{
+					if(_anchorPoints[ix].x < minX)
+						minX 					= _anchorPoints[ix].x;
+					else if(_anchorPoints[ix].y < minY)
+						minY 					= _anchorPoints[ix].y;
+					if(_anchorPoints[ix].x > maxX)
+						maxX	 				= _anchorPoints[ix].x;
+					else if(_anchorPoints[ix].y > maxY)
+						maxY 					= _anchorPoints[ix].y;
+				}
+				
+				for(ix = 0; ix < _controlPoints.length; ix++)
+				{
+					if(_controlPoints[ix].x < minX)
+						minX 					= _controlPoints[ix].x;
+					else if(_controlPoints[ix].y < minY)
+						minY 					= _controlPoints[ix].y;
+					if(_controlPoints[ix].x > maxX)
+						maxX 					= _controlPoints[ix].x;
+					else if(_controlPoints[ix].y > maxY)
+						maxY 					= _controlPoints[ix].y;
+				}
+				
+				_boundBox.x 			= minX + sprSpline.x;
+				_boundBox.y 			= minY + sprSpline.y;
+				_boundBox.width 	= maxX - minX + sprSpline.x;
+				_boundBox.height 	= maxY - minY + sprSpline.y;
+				
+				return _boundBox;
+			}
+
+			/**
+			 * dont forget to fiil up the shape for better cutout
+			 */ 
+			public function getSplineShape(): Shape
+			{
+				
+				var splShape: Shape	=	new Shape();
+				
+				splShape.graphics.clear();
+				
+				splShape.graphics.lineStyle(1, 0);
+				
+				splShape.graphics.moveTo(_firstPoint.x, _firstPoint.y);
+				
+				for(var ix:uint	=	0; ix < _controlPoints.length; ix++) {
+					splShape.graphics.curveTo(_controlPoints[ix].x, _controlPoints[ix].y, _anchorPoints[ix].x, _anchorPoints[ix].y);
+				}
+				
+				return splShape;
+			}
+			
+			public function reset():void
+			{
+				_firstPoint 			= new Point(0, -50);
+				
+				//_controlPoints 		= new <Point>[new Point(50,-50), 	new Point(50,50), new Point(-50,50), 	new Point(-50,-50)	];
+				//_anchorPoints	 		= new <Point>[new Point(50,0), 		new Point(0,50), 	new Point(-50,0), 	new Point(0,-50)		];
+				
+				scaleSplinePoints(1.4, 2);
+				
+				
+				for(var ix:uint = 0; ix < _controlPointsUi.length; ix++)	
+				{
+					_controlPointsUi[ix].x 										= _controlPoints[ix].x * 1;
+					_controlPointsUi[ix].y 										= _controlPoints[ix].y * 1;
+				}
+				
+				for(ix = 0; ix < _anchorPointsUi.length; ix++)	
+				{
+					_anchorPointsUi[ix].x 										= _anchorPoints[ix].x	*	1;
+					_anchorPointsUi[ix].y 										= _anchorPoints[ix].y	*	1;
+				}
+				
+				drawSpline();
+			}
+			
+			public function setControlPointsVisibility($visible:Boolean = true):void
+			{
+				sprCPs.visible = $visible;
+			}
+			
+			public function get bmpIconUp():										BitmapData	{	return _bmpIconUp;		}
+			public function set bmpIconUp(value:BitmapData):		void				
+			{	
+				_bmpIconUp = value;
+				
+				if(initialized)
+					refreshCP();
+			}
+			public function get bmpIconDown():									BitmapData	{	return _bmpIconDown;	}
+			public function set bmpIconDown(value:BitmapData):	void				
+			{	
+				_bmpIconDown = value;
+				
+				if(initialized)
+					refreshCP();
+			}
+			
+			public function get splineShape():Shape
+			{
+				return _splineShape;
+			}
+			
+			public function get bounds():Rectangle
+			{
+				return _boundForDragging;
+			}
+
+			private function checkIfDummyPointsNeeded():void
+			{
+				if(_firstPoint == null)
+					_firstPoint 				= new Point(0, -50);
+
+				if(_controlPoints)
+					_controlPoints 			= new <Point>[new Point(50,-50), 	new Point(50,50), new Point(-50,50), 	new Point(-50,-50)	];
+				
+				if(_anchorPoints)
+					_anchorPoints	 			= new <Point>[new Point(50,0), 		new Point(0,50), 	new Point(-50,0), 	new Point(0,-50)		];
+				
+			}
+			
+			protected function refreshCP():void
+			{
+				for(var ix:uint = 0; ix < _controlPointsUi.length; ix++)	
+				{
+					_controlPointsUi[ix].bmpIconDown 	= _bmpIconDown;
+					_controlPointsUi[ix].bmpIconUp 		= _bmpIconUp;
+					_controlPointsUi[ix].update();
+				}
+				
+				for(ix = 0; ix < _anchorPointsUi.length; ix++)	
+				{
+					_anchorPointsUi[ix].bmpIconDown 	= _bmpIconDown;
+					_anchorPointsUi[ix].bmpIconUp 		= _bmpIconUp;
+					_anchorPointsUi[ix].update();
+				}
+				
+			}
+			
+			private function onCreationCompleteHandler(event:FlexEvent = null):void
+			{
+				//checkIfDummyPointsNeeded();
+				
+				_splineShape				= new Shape();
+				_controlPointsUi 		= new Vector.<ControlPoint>();
+				_anchorPointsUi	 		= new Vector.<ControlPoint>();
+				
+				sprSpline.x 				= width	/2;
+				sprSpline.y 				= height/2;
+				sprCPs.x 						= width	/2;
+				sprCPs.y 						= height/2;
+
+				_boundBox 					= new Rectangle();
+				_boundForDragging		=	new Rectangle(-sprSpline.x, -sprSpline.y, width, height);
+
+				_isCreated					=	true;
+							
+				redraw();
+			}
+			
+			private function scaleSplinePoints($scaleX:Number, $scaleY:Number):void
+			{
+				if(_controlPoints == null || _anchorPoints == null || _firstPoint == null)
+					return;
+				
+				for(var ix:uint = 0 ; ix < _controlPoints.length; ix++) {
+					_controlPoints[ix].x 	*= $scaleX;
+					_controlPoints[ix].y 	*= $scaleY;
+				}
+				
+				for(ix = 0 ; ix < _anchorPoints.length; ix++) {
+					_anchorPoints[ix].x 	*= $scaleX;
+					_anchorPoints[ix].y 	*= $scaleY;
+				}
+				
+				_firstPoint.x						*= $scaleX;
+				_firstPoint.y						*= $scaleY;
+			}
+			
+			
+			private function drawSpline():void
+			{
+				_splineShape.graphics.clear();
+				
+				_splineShape.graphics.beginFill(0x000000, 1);
+				_splineShape.graphics.drawRect(-width/2,	-height/2, width, height);
+				_splineShape.graphics.endFill();
+				
+				_splineShape.graphics.lineStyle(1, 0);
+				
+				_splineShape.graphics.beginFill(0xffffff, 1);
+
+				_splineShape.graphics.moveTo(_firstPoint.x, _firstPoint.y);
+				
+				for(var ix:uint	=	0; ix < _controlPoints.length; ix++) {
+					_splineShape.graphics.curveTo(_controlPoints[ix].x, _controlPoints[ix].y, _anchorPoints[ix].x, _anchorPoints[ix].y);
+				}
+				
+				_splineShape.graphics.endFill();
+				
+				if(_splineShape.parent == null) {
+					sprSpline.addChild(_splineShape);
+					if(onSplineShapeIsReady is Function)
+						onSplineShapeIsReady();
+				}
+			}
+			
+			private function drawCP():void
+			{
+				var cp:	ControlPoint 			= null;
+				
+				sprCPs.removeChildren();
+				
+				_controlPointsUi.length		=	0;
+				_anchorPointsUi.length		=	0;
+				
+				if(_bmpIconDown)
+					CP_SIZE = _bmpIconDown.width;
+				
+				for(var ix:uint = 0; ix < _controlPoints.length; ix++)	
+				{
+					cp											= new ControlPoint(CP_SIZE, CP_SIZE);
+					cp.bmpIconDown					=	_bmpIconDown;
+					cp.bmpIconUp						=	_bmpIconUp;
+					cp.cb_onUpdate 					= onCpMoved;
+					cp.bound								=	_boundForDragging;
+					
+					cp.x 										= _controlPoints[ix].x * 1;
+					cp.y 										= _controlPoints[ix].y * 1;
+					
+					_controlPointsUi.push(cp);
+					
+					sprCPs.addChild(cp);
+				}
+
+				for(ix = 0; ix < _anchorPoints.length; ix++)	
+				{
+					cp 											= new ControlPoint(CP_SIZE, CP_SIZE);
+					cp.bmpIconDown					=	_bmpIconDown;
+					cp.bmpIconUp						=	_bmpIconUp;
+					cp.cb_onUpdate 					= onCpMoved;
+					cp.bound								=	_boundForDragging;
+					
+					cp.x 										= _anchorPoints[ix].x	*	1;
+					cp.y 										= _anchorPoints[ix].y	*	1;
+					
+					_anchorPointsUi.push(cp);
+					
+					sprCPs.addChild(cp);
+				}
+			}
+			
+			private function onCpMoved():void
+			{
+				for(var ix:uint	=	0; ix < _controlPoints.length; ix++) {
+
+					_controlPoints[ix].x 	= _controlPointsUi[ix].x	/	1;
+					_controlPoints[ix].y 	= _controlPointsUi[ix].y	/	1;
+					
+				}
+				
+				for(ix =	0; ix < _anchorPoints.length; ix++) {
+					_anchorPoints[ix].x 	= _anchorPointsUi[ix].x	/	1;
+					_anchorPoints[ix].y 	= _anchorPointsUi[ix].y	/	1;
+				}
+				
+				_firstPoint 						= _anchorPoints[_anchorPoints.length - 1];
+				
+				drawSpline();
+			}
+			
+
+		]]>
+	</fx:Script>
+	
+	<s:SpriteVisualElement id="sprSpline" 	width="100%" height="100%"/>
+	<s:SpriteVisualElement id="sprCPs" 		width="100%" height="100%"/>
+</s:Group>

@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+				 xmlns:s="library://ns.adobe.com/flex/spark" 
+				 xmlns:mx="library://ns.adobe.com/flex/mx"
+				 xmlns:comps="com.flexcomps.weatherComp.comps.*"
+				 creationComplete="onCreationCompleteHandler(event)"
+				 width="100%" height="100%" >
+
+	<fx:Script>
+		<![CDATA[
+			import com.flexcomps.weatherComp.core.DailyWeather;
+			import com.flexcomps.weatherComp.core.WeatherData;
+			import com.flexcomps.weatherComp.core.WeatherRss;
+			import com.flexcomps.weatherComp.core.WeatherSettings;
+			
+			import mx.events.FlexEvent;
+			
+			private var _mrWeatherRss:					WeatherRss	=	null;
+			private var _mrWeatherData:					WeatherData	=	null;
+			private var _mrWeatherUpdateTimer:	Timer					=	null;
+			
+			public function mrUpdateWeather():void
+			{
+				_mrWeatherRss.load();
+			}
+			
+			private function onCreationCompleteHandler(event:FlexEvent):void
+			{
+				_mrWeatherUpdateTimer				=	new Timer(WeatherSettings.WEATHER_UPDATE_TIME_INTERVAL);
+				_mrWeatherUpdateTimer.addEventListener(TimerEvent.TIMER, onTimerUpdateTime);
+				_mrWeatherUpdateTimer.start();
+				
+				visible 										= false;
+
+				_mrWeatherRss 							= new WeatherRss();
+				
+				_mrWeatherRss.cb_onComplete = onRssComplete;
+				_mrWeatherRss.cb_onError 		= onRssError;
+				
+				mrUpdateWeather();
+			}
+			
+			private function onRssComplete():void
+			{
+				trace("Weather RSS Complete");
+
+				_mrWeatherData 				= _mrWeatherRss.mrWeatherData;
+				
+				var dw:DailyWeather	=	null;
+				
+				var date:Date = new Date();
+				
+				try{
+					dw 										= _mrWeatherData.dailyWeathers[(date.day + 0)%7];
+					dws1.mrWeatherUpdate(dw.dayHeb, dw.tempLow + "-" + dw.tempHigh, dw.weatherDescIcon);
+					
+					dw 										= _mrWeatherData.dailyWeathers[(date.day + 1)%7];
+					dws2.mrWeatherUpdate(dw.dayHeb, dw.tempLow + "-" + dw.tempHigh, dw.weatherDescIcon);
+					
+					dw 										= _mrWeatherData.dailyWeathers[(date.day + 2)%7];
+					dws3.mrWeatherUpdate(dw.dayHeb, dw.tempLow + "-" + dw.tempHigh, dw.weatherDescIcon);
+				}
+				catch(err:Error){
+					return;
+				}
+				
+				dwb.mrWeatherUpdate(_mrWeatherData.nowWeather.tempLow.toString(), _mrWeatherData.nowWeather.weatherDescHeb, _mrWeatherData.nowWeather.weatherDescIcon, _mrWeatherData.nowWeather.humidity.toString());
+				
+				visible 							= true;
+			}
+			
+			private function onRssError():void
+			{
+				trace("Weather RSS Error");
+				visible = false;
+			}
+			
+			protected function onTimerUpdateTime(event:TimerEvent):void
+			{
+				trace("MrWeather.onTimerUpdateTime()");
+				mrUpdateWeather();
+			}
+			//roComps/roWeatherComp/assets/shadow.png
+		]]>
+	</fx:Script>
+	
+	<s:HGroup width="100%" height="100%" gap="0">
+		
+		<s:Group width="100%" height="100%">
+			<s:VGroup width="100%" height="100%" gap="0">
+				<comps:DailyWeatherSmall id="dws1" width="100%" height="100%"/>
+				<comps:DailyWeatherSmall id="dws2" width="100%" height="100%"/>
+				<comps:DailyWeatherSmall id="dws3" width="100%" height="100%"/>
+			</s:VGroup>
+			<s:BitmapImage source="@Embed('com/flexcomps/weatherComp/assets/shadow.png')" height="100%" scaleMode="stretch" right="0" smooth="true" />
+		</s:Group>
+		
+		<comps:DailyWeatherBig id="dwb" width="100%" height="100%"/>
+	</s:HGroup>
+		
+</s:Group>

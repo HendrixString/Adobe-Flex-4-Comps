@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+				 xmlns:s="library://ns.adobe.com/flex/spark" 
+				 xmlns:mx="library://ns.adobe.com/flex/mx"
+				 creationComplete="onCreationCompleteHandler(event)"
+				 width="100%" height="100%">
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	
+	<fx:Script>
+		<![CDATA[
+			import com.flexcomps.cameraDisplay.core.CameraController;
+			
+			import mx.events.FlexEvent;
+			
+			static public const ZOOM:				String = "zoom";
+			static public const LETTERBOX :	String = "letterbox";
+			static public const STRETCH:		String = "stretch";
+			
+			/**
+			 *	the Camera controller.
+			 */ 
+			protected var _cController:	CameraController 	= null;
+			
+			/**
+			 *	start capturing and displaying on load or use the <code>start()</code> method
+			 */ 
+			public var startCapture:		Boolean						=	false;
+			
+			/**
+			 *	a scale mode for the display, choose between: <br><ul><code><li>CameraDisplay.ZOOM <li>CameraDisplay.LETTERBOX <li>CameraDisplay.STRETCH</code>
+			 */ 
+			public var scaleMode:				String						=	ZOOM;
+			
+			private var _onCameraUpdate:	Function					=	null;
+			
+			/**
+			 * Start the camera capture 
+			 */ 
+			public function start():void
+			{
+				_cController.startVideoCapture();
+			}
+			
+			/**
+			 * Stop the camera capture 
+			 */ 
+			public function stop():void
+			{
+				_cController.stopVideoCapture();
+			}
+			
+			protected function onCreationCompleteHandler(event:FlexEvent):void
+			{
+				_cController 									= new CameraController();
+				
+				_cController.onCameraUpdate 	= _onCameraUpdate;
+				_cController.onNewVideoFrame	=	onNewVideoFrame;
+				
+				_cController.init();
+
+				if(startCapture)
+					start();
+				
+				bmCamera.scaleMode 						= scaleMode;
+			}
+			
+			public function init():void
+			{
+				_cController.init();
+			}
+			
+			protected function onNewVideoFrame(bm:BitmapData = null):void
+			{
+				if(bm == null)
+					return;
+				
+				bmCamera.source = null;
+				bmCamera.source	=	bm;
+			}
+			
+			/**
+			 * use this to grab data like bitmapdata
+			 */ 
+			public function get cameraController():CameraController
+			{
+				return _cController;
+			}
+
+			/**
+			 *	get notification about new frames and errors
+			 */
+			public function get onCameraUpdate():Function	{	return _onCameraUpdate;	}
+			/**
+			 * @private
+			 */
+			public function set onCameraUpdate(value:Function):void
+			{
+				_onCameraUpdate = value;
+				
+				if(_cController)
+					_cController.onCameraUpdate = _onCameraUpdate;
+			}
+
+			
+		]]>
+	</fx:Script>
+	
+	<s:BitmapImage id="bmCamera" width="100%" height="100%" verticalAlign="middle" horizontalAlign="center"/>
+	
+	<!--<s:BitmapImage id="dsd" scaleMode="letterbox"/>-->
+
+</s:Group>
