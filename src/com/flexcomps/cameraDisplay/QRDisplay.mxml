@@ -3,7 +3,6 @@
 										xmlns:s="library://ns.adobe.com/flex/spark" 
 										xmlns:mx="library://ns.adobe.com/flex/mx" 
 										xmlns:comp="com.flexcomps.cameraDisplay.*" 
-										creationComplete="onCreationCompleteHandler(event)"
 										width="100%" height="100%">
 	<fx:Declarations>
 		<!-- Place non-visual elements (e.g., services, value objects) here -->
