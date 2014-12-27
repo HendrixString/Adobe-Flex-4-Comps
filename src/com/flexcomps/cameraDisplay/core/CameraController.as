@@ -84,12 +84,16 @@ package com.flexcomps.cameraDisplay.core
 			if(container && _video.parent!=container)
 				container.addChild(_video);
 			
-			_camera.addEventListener(Event.VIDEO_FRAME, onVideoFrame);
+			if(_camera) {
+				trace(Event.VIDEO_FRAME)
+				_camera.addEventListener(Event.VIDEO_FRAME, onVideoFrame);
+			}
 		}
 		
 		public function stopVideoCapture():void
 		{
-			_camera.removeEventListener(Event.VIDEO_FRAME, onVideoFrame);
+			if(_camera)
+				_camera.removeEventListener(Event.VIDEO_FRAME, onVideoFrame);
 		}
 		
 		protected function onStatus(event:StatusEvent):void
@@ -159,6 +163,12 @@ package com.flexcomps.cameraDisplay.core
 		{
 			return _cameraBufferWork;
 		}
+
+		public function get cameraBuffer():BitmapData
+		{
+			return _cameraBuffer;
+		}
+
 
 	}
 	

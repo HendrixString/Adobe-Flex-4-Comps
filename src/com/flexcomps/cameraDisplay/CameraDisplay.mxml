@@ -10,6 +10,10 @@
 	
 	<fx:Script>
 		<![CDATA[
+			/**
+			 * be sure to add in your app copiler settings -swf-version=17 
+			 */
+			
 			import com.flexcomps.cameraDisplay.core.CameraController;
 			
 			import mx.events.FlexEvent;
