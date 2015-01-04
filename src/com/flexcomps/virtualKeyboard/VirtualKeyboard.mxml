@@ -1,623 +1,623 @@
 <?xml version="1.0" encoding="utf-8"?>
 <s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:s="library://ns.adobe.com/flex/spark"
-				 xmlns:mx="library://ns.adobe.com/flex/mx" width="768" height="368" fontSize="32" fontWeight="bold"
-				 creationComplete="onCreationComplete(event)" focusEnabled="false">
-	<fx:Metadata>
-		[Event(name="keyDown",	type="flash.events.KeyboardEvent")]
-		[Event(name="keyUp",		type="flash.events.KeyboardEvent")]
-		[Event(name="languageChanged", type="com.flexcomps.virtualKeyboard.events.LanguageEvent")]
-	</fx:Metadata>	
-	<fx:Script>
-		<![CDATA[
-			import com.flexcomps.virtualKeyboard.events.LanguageEvent;
-			
-			import mx.automation.Automation;
-			import mx.automation.IAutomationObjectHelper;
-			import mx.automation.delegates.TextFieldAutomationHelper;
-			import mx.automation.events.TextSelectionEvent;
-			import mx.events.FlexEvent;
-			import mx.managers.ISystemManager;
-			
-			import spark.automation.delegates.SparkRichEditableTextAutomationHelper;
-			import spark.components.RichEditableText;
-			import spark.events.TextOperationEvent;
-			
-			private static const sBtnDelim: String = "btn_";
-			
-			protected var _shiftDown: Boolean = false;
-			protected var _hebrewDown: Boolean = true;
-			
-			private static var isInInsertMode: Boolean = true;			
-			
-			protected var _keys: Vector.<Key>;
-			protected var _hebrewKeys: Vector.<KeyTranslation> =	new <KeyTranslation>[
-				new KeyTranslation(Keyboard.Q,					"/"),
-				new KeyTranslation(Keyboard.W,					"'"),
-				new KeyTranslation(Keyboard.E,					"ק"),
-				new KeyTranslation(Keyboard.R,					"ר"),
-				new KeyTranslation(Keyboard.Y,					"א"),
-				new KeyTranslation(Keyboard.T,					"ט"),
-				new KeyTranslation(Keyboard.U,					"ו"),
-				new KeyTranslation(Keyboard.I,					"ן"),
-				new KeyTranslation(Keyboard.O,					"ם"),
-				new KeyTranslation(Keyboard.P,					"פ"),
-				new KeyTranslation(Keyboard.A,					"ש"),
-				new KeyTranslation(Keyboard.S,					"ד"),
-				new KeyTranslation(Keyboard.D,					"ג"),
-				new KeyTranslation(Keyboard.F,					"כ"),
-				new KeyTranslation(Keyboard.G,					"ע"),
-				new KeyTranslation(Keyboard.H,					"י"),
-				new KeyTranslation(Keyboard.J,					"ח"),
-				new KeyTranslation(Keyboard.K,					"ל"),
-				new KeyTranslation(Keyboard.L,					"ך"),
-				new KeyTranslation(Keyboard.SEMICOLON,	"ף"),
-				new KeyTranslation(Keyboard.QUOTE,			","),
-				new KeyTranslation(Keyboard.Z,					"ז"),
-				new KeyTranslation(Keyboard.X,					"ס"),
-				new KeyTranslation(Keyboard.C,					"ב"),
-				new KeyTranslation(Keyboard.V,					"ה"),
-				new KeyTranslation(Keyboard.B,					"נ"),
-				new KeyTranslation(Keyboard.N,					"מ"),
-				new KeyTranslation(Keyboard.M,					"צ"),
-				new KeyTranslation(Keyboard.COMMA,			"ת"),
-				new KeyTranslation(Keyboard.PERIOD,			"ץ"),
-				new KeyTranslation(Keyboard.SLASH,			".")];
-			
-			protected function keyCode(id: String): uint
-			{
-				switch (id)
-				{
-					case "x": return Keyboard.X;
-				}
-				return 0;
-			}
-
-			protected function onCreationComplete(event: FlexEvent): void
-			{
-				_keys = new <Key>[
-					new Key(Keyboard.NUMBER_1,	btn_1,					true,		"1", "!"),
-					new Key(Keyboard.NUMBER_2,	btn_2,					true,		"2", "@"),
-					new Key(Keyboard.NUMBER_3,	btn_3,					true,		"3", "#"),
-					new Key(Keyboard.NUMBER_4,	btn_4,					true,		"4", "$"),
-					new Key(Keyboard.NUMBER_5,	btn_5,					true,		"5", "%"),
-					new Key(Keyboard.NUMBER_6,	btn_6,					true,		"6", "^"),
-					new Key(Keyboard.NUMBER_7,	btn_7,					true,		"7", "&"),
-					new Key(Keyboard.NUMBER_8,	btn_8,					true,		"8", "*"),
-					new Key(Keyboard.NUMBER_9,	btn_9,					true,		"9", "("),
-					new Key(Keyboard.NUMBER_0,	btn_0,					true,		"0", ")"),
-					new Key(Keyboard.MINUS,			btn_MINUS,			true,		"-", "_"),
-					new Key(Keyboard.EQUAL,			btn_EQUAL,			true,		"=", "+"),
-					new Key(Keyboard.Q,					btn_Q,					true,		"q", "Q"),
-					new Key(Keyboard.W,					btn_W,					true,		"w", "W"),
-					new Key(Keyboard.E,					btn_E,					true,		"e", "E"),
-					new Key(Keyboard.R,					btn_R,					true,		"r", "R"),
-					new Key(Keyboard.T,					btn_T,					true,		"t", "T"),
-					new Key(Keyboard.Y,					btn_Y,					true,		"y", "Y"),
-					new Key(Keyboard.U,					btn_U,					true,		"u", "U"),
-					new Key(Keyboard.I,					btn_I,					true,		"i", "I"),
-					new Key(Keyboard.O,					btn_O,					true,		"o", "O"),
-					new Key(Keyboard.P,					btn_P,					true,		"p", "P"),
-					new Key(Keyboard.A,					btn_A,					true,		"a", "A"),
-					new Key(Keyboard.S,					btn_S,					true,		"s", "S"),
-					new Key(Keyboard.D,					btn_D,					true,		"d", "D"),
-					new Key(Keyboard.F,					btn_F,					true,		"f", "F"),
-					new Key(Keyboard.G,					btn_G,					true,		"g", "G"),
-					new Key(Keyboard.H,					btn_H,					true,		"h", "H"),
-					new Key(Keyboard.J,					btn_J,					true,		"j", "J"),
-					new Key(Keyboard.K,					btn_K,					true,		"k", "K"),
-					new Key(Keyboard.L,					btn_L,					true,		"l", "L"),
-					new Key(Keyboard.SEMICOLON,	btn_SEMICOLON,	true, 	";", ":"),
-					new Key(Keyboard.QUOTE,			btn_QUOTE,			true, 	"'", '"'),
-					new Key(Keyboard.Z,					btn_Z,					true,		"z", "Z"),
-					new Key(Keyboard.X,					btn_X,					true,		"x", "X"),
-					new Key(Keyboard.C,					btn_C,					true,		"c", "C"),
-					new Key(Keyboard.V,					btn_V,					true,		"v", "V"),
-					new Key(Keyboard.B,					btn_B,					true,		"b", "B"),
-					new Key(Keyboard.N,					btn_N,					true,		"n", "N"),
-					new Key(Keyboard.M,					btn_M,					true,		"m", "M"),
-					new Key(Keyboard.COMMA,			btn_COMMA,			true, 	",", "<"),
-					new Key(Keyboard.PERIOD,		btn_PERIOD, 		true, 	".", ">"),
-					new Key(Keyboard.SLASH,			btn_SLASH,			true, 	"/", "?"),
-					new Key(Keyboard.SPACE,			btn_SPACE,			true,		" ", " "),
-					new Key(Keyboard.ENTER,			btn_ENTER,			false),
-					new Key(Keyboard.SHIFT,			btn_SHIFT,			false),
-					new Key(Keyboard.BACKSPACE,	btn_BACKSPACE,	false),
-					new Key(6000,								btn_LANG,				false)
-				];
-				
-				var ix: uint;
-				var key: Key;
-				var lbl: String;
-				
-				for (ix = 0; ix < _keys.length; ix++)
-				{
-					key = _keys[ix];
-					key.button.focusEnabled = false;
-				}
-				
-				setHebrewDown(true);
-			}
-			
-			protected function onKeyClick(event: MouseEvent): void
-			{
-				// Translate button id to the correct keyboard code
-				var btn: Button = event.target as Button;
-				if (btn == null)
-					return;
-				
-				var key: Key = getKeyForBtn(btn);
-				if (key == null)
-					return;
-				
-				var cc: uint;
-				var translation: KeyTranslation;
-				if (_hebrewDown && (translation = getTranslation(key.code)))
-					cc = translation.value.charCodeAt(0);
-				else if (key.char)
-				{
-					if (_shiftDown)
-						cc = key.shiftChar.charCodeAt(0)
-					else
-						cc = key.char.charCodeAt(0);
-				}
-				else
-					cc = 0;
-				
-				dispatchEvent(new KeyboardEvent(KeyboardEvent.KEY_DOWN, true, false,
-					cc, key.code, 0,	false, false, _shiftDown));
-//				dispatchEvent(new KeyboardEvent(KeyboardEvent.KEY_UP, true, false,
-//					cc, key.code, 0,	false, false, _shiftDown, false, false));
-			}
-			
-			protected function onShiftClick(event:MouseEvent):void
-			{
-				_shiftDown = btn_SHIFT.selected;
-				
-				var ix: uint;
-				var key: Key;
-				var lbl: String;
-				
-				for (ix = 0; ix < _keys.length; ix++)
-				{
-					key = _keys[ix];
-					if (key.shiftable)
-					{
-						if (key.shiftChar == null)
-						{
-							lbl = key.button.label;
-							key.button.label = _shiftDown ? lbl.toUpperCase() : lbl.toLowerCase();
-						}
-						else {
-							key.button.label = _shiftDown ? key.shiftChar: key.char;
-						}
-					}
-				}
-			}
-		
-			protected function getTranslation(keyCode: uint): KeyTranslation
-			{
-				var ix: uint;
-				var translation: KeyTranslation;
-
-				for (ix = 0; ix < _hebrewKeys.length; ix++) {
-					translation = _hebrewKeys[ix];
-					if (translation.code == keyCode)
-						return translation;
-				}
-				return null;
-			}
-			
-			protected function setHebrewDown(value: Boolean): void
-			{
-				var ix: uint;
-				var key: Key;
-				var lbl: String;
-				var translation: KeyTranslation;
-				
-				_hebrewDown = value;
-				btn_LANG.label = _hebrewDown ? "En" : "א";
-				
-				if (_hebrewDown)
-					dispatchEvent(new LanguageEvent(LanguageEvent.LANGUAGE_CHANGED, false, false, LanguageEvent.HE));
-				else {
-					dispatchEvent(new LanguageEvent(LanguageEvent.LANGUAGE_CHANGED, false, false, LanguageEvent.EN));
-				}
-				
-				_shiftDown = false;
-				btn_SHIFT.selected = false;
-				btn_SHIFT.enabled = !_hebrewDown;
-				
-				for (ix = 0; ix < _keys.length; ix++)
-				{				
-					key = _keys[ix];
-					if (key.shiftable) 
-					{
-						if (_hebrewDown) {
-							translation = getTranslation(key.code);
-						}
-						else 
-							translation = null;
-						
-						if (translation) {
-							lbl = translation.value;
-						}
-						else {
-							lbl = key.char;
-						}
-						key.button.label = lbl;
-					}
-				}				
-			}
-			
-			protected function btn_LANG_onClick(event: MouseEvent): void
-			{
-				setHebrewDown(btn_LANG.selected);
-			}
-
-			public function get keys():Vector.<Key>
-			{
-				return _keys;
-			}
-
-			public function get hebrewKeys():Vector.<KeyTranslation>
-			{
-				return _hebrewKeys;
-			}
-			
-			public function getKeyForBtn(btn: Button): Key
-			{
-				var ix: uint;
-				var key: Key;
-				
-				for (ix = 0; ix < _keys.length; ix++)
-				{
-					key = _keys[ix];
-					if (key.button == btn)
-						return key;
-				}
-				return null;
-			}			
-
-			public function getKey(code: uint): Key
-			{
-				var ix: uint;
-				var key: Key;
-				
-				for (ix = 0; ix < _keys.length; ix++)
-				{
-					key = _keys[ix];
-					if (key.code == code)
-						return key;
-				}
-				return null;
-			}
-			
-			public static function translateEventForEditableText(event: KeyboardEvent): Event
-			{
-				// Translate the KeyboardEvent to a TextEvent if there is a usuable character code
-				var evt: Event;
-				if (event.charCode > 0)
-					evt = new TextEvent(TextEvent.TEXT_INPUT, false, false, String.fromCharCode(event.charCode));  
-				else
-					evt = event;
-				
-				return evt;
-			}
-			
-			/**
-			 * NOTE: This is a modified version of SparkRichEditableTextAutomationHelper.replayAutomatableEvent 
-			 * from spark.automation.delegates.
-			 * 
-			 * 	Replays TextEvens, Selection Event, and type events. TypeEvents  and Text events are replayed
-			 *  depending on the character typed.  Both  dispatches the origin keystrokes.
-			 *  This is necessary to mimic the original behavior, in case any components are
-			 *  listening to keystroke events (for example, DataGrid listens to itemRenderer events,
-			 *  or if a custom component is trying to do key masking).  In Halo, the text events were changing
-			 *  the contents using the text related methods as the flash player was ignoring the key evens.
-			 *  In Gumbo this is not the case, so for the text and type events, we need only to send the key strokes.
-			 *  dispatch the original keystrokes, but the Flash Player richEditableText ignores
-			 *  the events we are sending it.
-			 *
-			 * @param event Event to replay.
-			 * 
-			 * @return If true, replay the event.
-			 *  
-			 *  @langversion 3.0
-			 *  @playerversion Flash 9
-			 *  @playerversion AIR 1.1
-			 *  @productversion Flex 4
-			 */
- 			public static function replayRichTextEvent(richEditableText: RichEditableText, event: Event): Boolean
-			{
-				if ((richEditableText == null) || (event == null))
-					return false;
-				
-				var changeEvent: TextOperationEvent = new TextOperationEvent(TextOperationEvent.CHANGE);
-				
-				var sm:ISystemManager = Automation.getMainApplication().systemManager;
-				var help:IAutomationObjectHelper = Automation.automationObjectHelper;
-				
-				var ke:KeyboardEvent;
-				
-				if (event is TextSelectionEvent)
-				{
-					richEditableText.setFocus();
-					
-					// selection replay is done by calling the underlying select method.
-					// recorded value is anchorPosition and active position in order.
-					// Since we have used the existing TextSelection
-					var selectionEvent: TextSelectionEvent = TextSelectionEvent(event);
-					richEditableText.selectRange(selectionEvent.beginIndex, selectionEvent.endIndex);
-					
-					return true;
-				}
-				else if (event is TextEvent)
-				{
-					richEditableText.setFocus();
-					
-					var textEvent:TextEvent = TextEvent(event);
-					var text:String = textEvent.text;
-					var n:int = textEvent.text.length;
-					if(n == 0)
-					{
-						// if there is any selection we want
-						// to clear it, as this recording would have
-						// been resulted from cut operation. 
-						richEditableText.insertText("");
-					}
-					
-					// it was seen that at times event dispathing does not change
-					// the string and at times it changes.
-					// refer http://bugs.adobe.com/jira/browse/FLEXENT-1179
-					// We need to insert the text if the change has not happened.
-					// for this we need to find the string before and after the event dispatch.
-					// but the text does not display the correct value after the event dispatch. It shows
-					// only after we do an insert operation on the text after the same.
-					// but to do the inser operation, we need to find the active and anchor position also.
-					// this also does not change when the value is dispatched and still is at the beginning of the string.
-					// so we need to calcualte it. Here we need to consider the direction.
-					var stringBeforeChange:String = richEditableText.text;
-					var insertPos:int = richEditableText.selectionActivePosition;
-					var activePos:int = insertPos;
-					var anchorPos:int = richEditableText.selectionAnchorPosition;
-					var direction:int = -1;
-					if (richEditableText && richEditableText.textFlow && richEditableText.textFlow.computedFormat &&
-						richEditableText.textFlow.computedFormat.direction)
-					{
-						if (richEditableText.textFlow.computedFormat.direction=="ltr")
-							direction = 1;
-					}
-					richEditableText.selectRange(anchorPos, activePos);
-					for (var i:uint = 0; i < n; i++)
-					{
-						ke = new KeyboardEvent(KeyboardEvent.KEY_DOWN);
-						ke.charCode = text.charCodeAt(i);
-						ke.keyCode = text.charCodeAt(i);
-						richEditableText.dispatchEvent(ke);
-						
-						// we dont need any special handling on the string.
-						// replaying the key board events takes care of the needed.
-						// however when there is a line feed or carriage return , we need to handle it specially
-						if((text.charAt(i) == "\n") || (text.charAt(i) == "\r"))
-							richEditableText.insertText(text.charAt(i));
-						
-						var te:TextEvent = new TextEvent(TextEvent.TEXT_INPUT);
-						te.text = String(text.charAt(i)); 
-						// ref. http://bugs.adobe.com/jira/browse/FLEXENT-838 - charcode vs charAt
-						richEditableText.dispatchEvent(te);
-						// we dont need to select as the previous selection would have taken care of the 
-						// requried selection
-						
-						ke = new KeyboardEvent(KeyboardEvent.KEY_UP);
-						ke.charCode = text.charCodeAt(i);
-						ke.keyCode = text.charCodeAt(i);
-						richEditableText.dispatchEvent(ke);
-						
-						// dispatch a change event to indicate that the value is changed.
-						richEditableText.dispatchEvent(changeEvent);
-						// calculate the new insert position.
-						insertPos += 1;
-					}
-					
-					if (text.length > 0)
-					{
-						// do the operation to reflect the text value
-						richEditableText.selectRange(insertPos, insertPos);
-						richEditableText.insertText("");
-						
-						// check whethr the string is changed after the event dispatch
-						// refer http://bugs.adobe.com/jira/browse/FLEXENT-1179
-						var stringAfterChange:String = richEditableText.text;
-						
-						if (stringBeforeChange == stringAfterChange)
-						{
-							richEditableText.insertText(text);
-						}
-					}
-					
-					return true;
-				}
-				else if (event is KeyboardEvent)
-				{
-					var kbEvent: KeyboardEvent = KeyboardEvent(event);
-					var keyCode:int = kbEvent.keyCode;
-					switch (keyCode)
-					{
-						case Keyboard.HOME:
-							// replaying the keyboard events will do what's needed
-							break;
-						case Keyboard.END:
-							// replaying the keyboard events will do what's needed
-							break;
-						case Keyboard.ENTER:
-							// replaying the keyboard events will do what's needed
-							break;
-						case Keyboard.BACKSPACE:
-							// replaying the keyboard events will do what's needed
-							break;
-						case Keyboard.DELETE:
-							// replaying the keyboard events will do what's needed
-							break;
-						case Keyboard.INSERT:
-							isInInsertMode = !isInInsertMode;
-							break;
-						case Keyboard.ESCAPE:
-							// replaying the keyboard events will do what's needed
-							break;
-						default:
-							var message: String = "Event is not replayable, for keycode: " + keyCode;
-							throw new Error(message);
-					}
-					
-					ke = new KeyboardEvent(KeyboardEvent.KEY_DOWN);
-					ke.charCode = keyCode;
-					ke.keyCode = keyCode;
-					ke.ctrlKey = kbEvent.ctrlKey;
-					ke.shiftKey = kbEvent.shiftKey;
-					ke.altKey = kbEvent.altKey;
-					
-					richEditableText.dispatchEvent(ke);
-					
-					ke = new KeyboardEvent(KeyboardEvent.KEY_UP);
-					ke.charCode = keyCode;
-					ke.keyCode = keyCode;
-					ke.ctrlKey = kbEvent.ctrlKey;
-					ke.shiftKey = kbEvent.shiftKey;
-					ke.altKey = kbEvent.altKey;
-					
-					richEditableText.dispatchEvent(ke);
-					
-					richEditableText.dispatchEvent(changeEvent);
-					return true;
-				}
-				return false;
-			}
- 		]]>
-	</fx:Script>
-
-	<s:Rect id="rectBackground" width="100%" height="100%">
-		<s:fill>
-			<s:LinearGradient rotation="90">
-				<s:GradientEntry color="0xA0A8B1"/>
-				<s:GradientEntry color="0x56616F"/>
-			</s:LinearGradient>
-		</s:fill>
-	</s:Rect>
-
-	<s:Group id="grpContainer" left="20" top="20" right="20" bottom="20">
-		<s:VGroup width="100%" height="100%" gap="0" horizontalAlign="center" requestedRowCount="4">
-			<s:HGroup id="hgRow1" width="100%" height="20%" gap="10" paddingBottom="15" paddingLeft="20"
-								paddingRight="20" verticalAlign="contentJustify">
-				<s:Button id="btn_1" skinClass="com.flexcomps.virtualKeyboard.OpaqueButton" width="100%" height="100%" label="1"
-									cornerRadius="7" click="onKeyClick(event)"/>
-				<s:Button id="btn_2" skinClass="com.flexcomps.virtualKeyboard.OpaqueButton" width="100%" height="100%" label="2"
-									cornerRadius="7" click="onKeyClick(event)"/>
-				<s:Button id="btn_3" skinClass="com.flexcomps.virtualKeyboard.OpaqueButton" width="100%" height="100%" label="3"
-									cornerRadius="7" click="onKeyClick(event)"/>
-				<s:Button id="btn_4" skinClass="com.flexcomps.virtualKeyboard.OpaqueButton" width="100%" height="100%" label="4"
-									cornerRadius="7" click="onKeyClick(event)"/>
-				<s:Button id="btn_5" skinClass="com.flexcomps.virtualKeyboard.OpaqueButton" width="100%" height="100%" label="5"
-									cornerRadius="7" click="onKeyClick(event)"/>
-				<s:Button id="btn_6" skinClass="com.flexcomps.virtualKeyboard.OpaqueButton" width="100%" height="100%" label="6"
-									cornerRadius="7" click="onKeyClick(event)"/>
-				<s:Button id="btn_7" skinClass="com.flexcomps.virtualKeyboard.OpaqueButton" width="100%" height="100%" label="7"
-									cornerRadius="7" click="onKeyClick(event)"/>
-				<s:Button id="btn_8" skinClass="com.flexcomps.virtualKeyboard.OpaqueButton" width="100%" height="100%" label="8"
-									cornerRadius="7" click="onKeyClick(event)"/>
-				<s:Button id="btn_9" skinClass="com.flexcomps.virtualKeyboard.OpaqueButton" width="100%" height="100%" label="9"
-									cornerRadius="7" click="onKeyClick(event)"/>
-				<s:Button id="btn_0" skinClass="com.flexcomps.virtualKeyboard.OpaqueButton" width="100%" height="100%" label="0"
-									cornerRadius="7" click="onKeyClick(event)"/>
-				<s:Button id="btn_MINUS" skinClass="com.flexcomps.virtualKeyboard.OpaqueButton" width="100%" height="100%" label="-"
-									cornerRadius="7" click="onKeyClick(event)"/>
-				<s:Button id="btn_EQUAL" skinClass="com.flexcomps.virtualKeyboard.OpaqueButton" width="100%" height="100%" label="="
-									cornerRadius="7" click="onKeyClick(event)"/>
-			</s:HGroup>
-			<s:HGroup id="hgRow2" width="100%" height="21%" gap="14" paddingBottom="10" verticalAlign="contentJustify">
-				<s:Button id="btn_Q" skinClass="com.flexcomps.virtualKeyboard.OpaqueButton" width="100%" height="100%" label="q"
-									cornerRadius="7" click="onKeyClick(event)"/>
-				<s:Button id="btn_W" skinClass="com.flexcomps.virtualKeyboard.OpaqueButton" width="100%" height="100%" label="w"
-									cornerRadius="7" click="onKeyClick(event)"/>
-				<s:Button id="btn_E" skinClass="com.flexcomps.virtualKeyboard.OpaqueButton" width="100%" height="100%" label="e"
-									cornerRadius="7" click="onKeyClick(event)"/>
-				<s:Button id="btn_R" skinClass="com.flexcomps.virtualKeyboard.OpaqueButton" width="100%" height="100%" label="r"
-									cornerRadius="7" click="onKeyClick(event)"/>
-				<s:Button id="btn_T" skinClass="com.flexcomps.virtualKeyboard.OpaqueButton" width="100%" height="100%" label="t"
-									cornerRadius="7" click="onKeyClick(event)"/>
-				<s:Button id="btn_Y" skinClass="com.flexcomps.virtualKeyboard.OpaqueButton" width="100%" height="100%" label="y"
-									cornerRadius="7" click="onKeyClick(event)"/>
-				<s:Button id="btn_U" skinClass="com.flexcomps.virtualKeyboard.OpaqueButton" width="100%" height="100%" label="u"
-									cornerRadius="7" click="onKeyClick(event)"/>
-				<s:Button id="btn_I" skinClass="com.flexcomps.virtualKeyboard.OpaqueButton" width="100%" height="100%" label="i"
-									cornerRadius="7" click="onKeyClick(event)"/>
-				<s:Button id="btn_O" skinClass="com.flexcomps.virtualKeyboard.OpaqueButton" width="100%" height="100%" label="o"
-									cornerRadius="7" click="onKeyClick(event)"/>
-				<s:Button id="btn_P" skinClass="com.flexcomps.virtualKeyboard.OpaqueButton" width="100%" height="100%" label="p"
-									cornerRadius="7" click="onKeyClick(event)"/>
-			</s:HGroup>
-			<s:HGroup id="hgRow3" width="100%" height="21%" gap="12" paddingBottom="10" paddingLeft="12"
-								paddingRight="12" verticalAlign="contentJustify">
-				<s:Button id="btn_A" skinClass="com.flexcomps.virtualKeyboard.OpaqueButton" width="100%" height="100%" label="a"
-									cornerRadius="7" click="onKeyClick(event)" />
-				<s:Button id="btn_S" skinClass="com.flexcomps.virtualKeyboard.OpaqueButton" width="100%" height="100%" label="s"
-									cornerRadius="7" click="onKeyClick(event)" />
-				<s:Button id="btn_D" skinClass="com.flexcomps.virtualKeyboard.OpaqueButton" width="100%" height="100%" label="d"
-									cornerRadius="7" click="onKeyClick(event)" />
-				<s:Button id="btn_F" skinClass="com.flexcomps.virtualKeyboard.OpaqueButton" width="100%" height="100%" label="f"
-									cornerRadius="7" click="onKeyClick(event)" />
-				<s:Button id="btn_G" skinClass="com.flexcomps.virtualKeyboard.OpaqueButton" width="100%" height="100%" label="g"
-									cornerRadius="7" click="onKeyClick(event)" />
-				<s:Button id="btn_H" skinClass="com.flexcomps.virtualKeyboard.OpaqueButton" width="100%" height="100%" label="h"
-									cornerRadius="7" click="onKeyClick(event)" />
-				<s:Button id="btn_J" skinClass="com.flexcomps.virtualKeyboard.OpaqueButton" width="100%" height="100%" label="j"
-									cornerRadius="7" click="onKeyClick(event)" />
-				<s:Button id="btn_K" skinClass="com.flexcomps.virtualKeyboard.OpaqueButton" width="100%" height="100%" label="k"
-									cornerRadius="7" click="onKeyClick(event)" />
-				<s:Button id="btn_L" skinClass="com.flexcomps.virtualKeyboard.OpaqueButton" width="100%" height="100%" label="l"
-									cornerRadius="7" click="onKeyClick(event)" />
-				<s:Button id="btn_SEMICOLON" skinClass="com.flexcomps.virtualKeyboard.OpaqueButton" width="100%" height="100%" label=";"
-									cornerRadius="7" click="onKeyClick(event)" />
-				<s:Button id="btn_QUOTE" width="100%" height="100%" label="'" click="onKeyClick(event)"
-									cornerRadius="7" fontWeight="normal" skinClass="com.flexcomps.virtualKeyboard.OpaqueButton"/>
-			</s:HGroup>
-			<s:HGroup id="hgRow4" width="100%" height="22%" gap="10" paddingBottom="15" paddingLeft="20"
-								paddingRight="20" verticalAlign="contentJustify">
-				<s:Button id="btn_Z" skinClass="com.flexcomps.virtualKeyboard.OpaqueButton" width="100%" height="100%" label="z"
-									cornerRadius="7" click="onKeyClick(event)" />
-				<s:Button id="btn_X" skinClass="com.flexcomps.virtualKeyboard.OpaqueButton" width="100%" height="100%" label="x"
-									cornerRadius="7" click="onKeyClick(event)" />
-				<s:Button id="btn_C" skinClass="com.flexcomps.virtualKeyboard.OpaqueButton" width="100%" height="100%" label="c"
-									cornerRadius="7" click="onKeyClick(event)" />
-				<s:Button id="btn_V" skinClass="com.flexcomps.virtualKeyboard.OpaqueButton" width="100%" height="100%" label="v"
-									cornerRadius="7" click="onKeyClick(event)" />
-				<s:Button id="btn_B" skinClass="com.flexcomps.virtualKeyboard.OpaqueButton" width="100%" height="100%" label="b"
-									cornerRadius="7" click="onKeyClick(event)" />
-				<s:Button id="btn_N" skinClass="com.flexcomps.virtualKeyboard.OpaqueButton" width="100%" height="100%" label="n"
-									cornerRadius="7" click="onKeyClick(event)" />
-				<s:Button id="btn_M" skinClass="com.flexcomps.virtualKeyboard.OpaqueButton" width="100%" height="100%" label="m"
-									cornerRadius="7" click="onKeyClick(event)" />
-				<s:Button id="btn_COMMA" skinClass="com.flexcomps.virtualKeyboard.OpaqueButton" width="100%" height="100%" label=","
-									cornerRadius="7" click="onKeyClick(event)" />
-				<s:Button id="btn_PERIOD" skinClass="com.flexcomps.virtualKeyboard.OpaqueButton" width="100%" height="100%" label="."
-									cornerRadius="7" click="onKeyClick(event)" />
-				<s:Button id="btn_SLASH" skinClass="com.flexcomps.virtualKeyboard.OpaqueButton" width="100%" height="100%" label="/"
-									cornerRadius="7" click="onKeyClick(event)" />
-				<s:Button id="btn_ENTER" height="100%" label="enter" click="onKeyClick(event)"
-									cornerRadius="7" fontWeight="normal"/>
-			</s:HGroup>
-			<s:HGroup id="hgRow5" width="100%" height="16%" gap="18" paddingBottom="0" verticalAlign="justify">
-				<s:ToggleButton id="btn_SHIFT" width="10%" height="100%" label="⌂" chromeColor="#69737F"
-												click="onShiftClick(event)" cornerRadius="7" fontWeight="normal"
-												skinClass="com.flexcomps.virtualKeyboard.OpaqueToggleButton"/>
-				<s:Button id="btn_SPACE" width="65%" height="100%" label="space" click="onKeyClick(event)"
-									cornerRadius="7" fontWeight="bold" skinClass="com.flexcomps.virtualKeyboard.OpaqueButton"/>
-				<s:Button id="btn_BACKSPACE" width="15%" height="100%" label="←" chromeColor="#69737F"
-									click="onKeyClick(event)" cornerRadius="7" fontWeight="normal"
-									skinClass="com.flexcomps.virtualKeyboard.OpaqueButton"/>
-				<s:ToggleButton id="btn_LANG" width="10%" height="100%" label="En" chromeColor="#69737F"
-												click="btn_LANG_onClick(event)" cornerRadius="7" fontWeight="bold"
-												selected="true" skinClass="com.flexcomps.virtualKeyboard.OpaqueToggleButton"/>
-			</s:HGroup>
-		</s:VGroup>
-	</s:Group>
+         xmlns:mx="library://ns.adobe.com/flex/mx" width="768" height="368" fontSize="32" fontWeight="bold"
+         creationComplete="onCreationComplete(event)" focusEnabled="false">
+  <fx:Metadata>
+    [Event(name="keyDown",  type="flash.events.KeyboardEvent")]
+    [Event(name="keyUp",    type="flash.events.KeyboardEvent")]
+    [Event(name="languageChanged", type="com.flexcomps.virtualKeyboard.events.LanguageEvent")]
+  </fx:Metadata>  
+  <fx:Script>
+    <![CDATA[
+      import com.flexcomps.virtualKeyboard.events.LanguageEvent;
+      
+      import mx.automation.Automation;
+      import mx.automation.IAutomationObjectHelper;
+      import mx.automation.delegates.TextFieldAutomationHelper;
+      import mx.automation.events.TextSelectionEvent;
+      import mx.events.FlexEvent;
+      import mx.managers.ISystemManager;
+      
+      import spark.automation.delegates.SparkRichEditableTextAutomationHelper;
+      import spark.components.RichEditableText;
+      import spark.events.TextOperationEvent;
+      
+      private static const sBtnDelim: String = "btn_";
+      
+      protected var _shiftDown: Boolean = false;
+      protected var _hebrewDown: Boolean = true;
+      
+      private static var isInInsertMode: Boolean = true;      
+      
+      protected var _keys: Vector.<Key>;
+      protected var _hebrewKeys: Vector.<KeyTranslation> =  new <KeyTranslation>[
+        new KeyTranslation(Keyboard.Q,          "/"),
+        new KeyTranslation(Keyboard.W,          "'"),
+        new KeyTranslation(Keyboard.E,          "ק"),
+        new KeyTranslation(Keyboard.R,          "ר"),
+        new KeyTranslation(Keyboard.Y,          "א"),
+        new KeyTranslation(Keyboard.T,          "ט"),
+        new KeyTranslation(Keyboard.U,          "ו"),
+        new KeyTranslation(Keyboard.I,          "ן"),
+        new KeyTranslation(Keyboard.O,          "ם"),
+        new KeyTranslation(Keyboard.P,          "פ"),
+        new KeyTranslation(Keyboard.A,          "ש"),
+        new KeyTranslation(Keyboard.S,          "ד"),
+        new KeyTranslation(Keyboard.D,          "ג"),
+        new KeyTranslation(Keyboard.F,          "כ"),
+        new KeyTranslation(Keyboard.G,          "ע"),
+        new KeyTranslation(Keyboard.H,          "י"),
+        new KeyTranslation(Keyboard.J,          "ח"),
+        new KeyTranslation(Keyboard.K,          "ל"),
+        new KeyTranslation(Keyboard.L,          "ך"),
+        new KeyTranslation(Keyboard.SEMICOLON,  "ף"),
+        new KeyTranslation(Keyboard.QUOTE,      ","),
+        new KeyTranslation(Keyboard.Z,          "ז"),
+        new KeyTranslation(Keyboard.X,          "ס"),
+        new KeyTranslation(Keyboard.C,          "ב"),
+        new KeyTranslation(Keyboard.V,          "ה"),
+        new KeyTranslation(Keyboard.B,          "נ"),
+        new KeyTranslation(Keyboard.N,          "מ"),
+        new KeyTranslation(Keyboard.M,          "צ"),
+        new KeyTranslation(Keyboard.COMMA,      "ת"),
+        new KeyTranslation(Keyboard.PERIOD,     "ץ"),
+        new KeyTranslation(Keyboard.SLASH,      ".")];
+      
+      protected function keyCode(id: String): uint
+      {
+        switch (id)
+        {
+          case "x": return Keyboard.X;
+        }
+        return 0;
+      }
+      
+      protected function onCreationComplete(event: FlexEvent): void
+      {
+        _keys = new <Key>[
+          new Key(Keyboard.NUMBER_1,  btn_1,          true,   "1", "!"),
+          new Key(Keyboard.NUMBER_2,  btn_2,          true,   "2", "@"),
+          new Key(Keyboard.NUMBER_3,  btn_3,          true,   "3", "#"),
+          new Key(Keyboard.NUMBER_4,  btn_4,          true,   "4", "$"),
+          new Key(Keyboard.NUMBER_5,  btn_5,          true,   "5", "%"),
+          new Key(Keyboard.NUMBER_6,  btn_6,          true,   "6", "^"),
+          new Key(Keyboard.NUMBER_7,  btn_7,          true,   "7", "&"),
+          new Key(Keyboard.NUMBER_8,  btn_8,          true,   "8", "*"),
+          new Key(Keyboard.NUMBER_9,  btn_9,          true,   "9", "("),
+          new Key(Keyboard.NUMBER_0,  btn_0,          true,   "0", ")"),
+          new Key(Keyboard.MINUS,     btn_MINUS,      true,   "-", "_"),
+          new Key(Keyboard.EQUAL,     btn_EQUAL,      true,   "=", "+"),
+          new Key(Keyboard.Q,         btn_Q,          true,   "q", "Q"),
+          new Key(Keyboard.W,         btn_W,          true,   "w", "W"),
+          new Key(Keyboard.E,         btn_E,          true,   "e", "E"),
+          new Key(Keyboard.R,         btn_R,          true,   "r", "R"),
+          new Key(Keyboard.T,         btn_T,          true,   "t", "T"),
+          new Key(Keyboard.Y,         btn_Y,          true,   "y", "Y"),
+          new Key(Keyboard.U,         btn_U,          true,   "u", "U"),
+          new Key(Keyboard.I,         btn_I,          true,   "i", "I"),
+          new Key(Keyboard.O,         btn_O,          true,   "o", "O"),
+          new Key(Keyboard.P,         btn_P,          true,   "p", "P"),
+          new Key(Keyboard.A,         btn_A,          true,   "a", "A"),
+          new Key(Keyboard.S,         btn_S,          true,   "s", "S"),
+          new Key(Keyboard.D,         btn_D,          true,   "d", "D"),
+          new Key(Keyboard.F,         btn_F,          true,   "f", "F"),
+          new Key(Keyboard.G,         btn_G,          true,   "g", "G"),
+          new Key(Keyboard.H,         btn_H,          true,   "h", "H"),
+          new Key(Keyboard.J,         btn_J,          true,   "j", "J"),
+          new Key(Keyboard.K,         btn_K,          true,   "k", "K"),
+          new Key(Keyboard.L,         btn_L,          true,   "l", "L"),
+          new Key(Keyboard.SEMICOLON, btn_SEMICOLON,  true,   ";", ":"),
+          new Key(Keyboard.QUOTE,     btn_QUOTE,      true,   "'", '"'),
+          new Key(Keyboard.Z,         btn_Z,          true,   "z", "Z"),
+          new Key(Keyboard.X,         btn_X,          true,   "x", "X"),
+          new Key(Keyboard.C,         btn_C,          true,   "c", "C"),
+          new Key(Keyboard.V,         btn_V,          true,   "v", "V"),
+          new Key(Keyboard.B,         btn_B,          true,   "b", "B"),
+          new Key(Keyboard.N,         btn_N,          true,   "n", "N"),
+          new Key(Keyboard.M,         btn_M,          true,   "m", "M"),
+          new Key(Keyboard.COMMA,     btn_COMMA,      true,   ",", "<"),
+          new Key(Keyboard.PERIOD,    btn_PERIOD,     true,   ".", ">"),
+          new Key(Keyboard.SLASH,     btn_SLASH,      true,   "/", "?"),
+          new Key(Keyboard.SPACE,     btn_SPACE,      true,   " ", " "),
+          new Key(Keyboard.ENTER,     btn_ENTER,      false),
+          new Key(Keyboard.SHIFT,     btn_SHIFT,      false),
+          new Key(Keyboard.BACKSPACE, btn_BACKSPACE,  false),
+          new Key(6000,               btn_LANG,       false)
+        ];
+        
+        var ix: uint;
+        var key: Key;
+        var lbl: String;
+        
+        for (ix = 0; ix < _keys.length; ix++)
+        {
+          key = _keys[ix];
+          key.button.focusEnabled = false;
+        }
+        
+        setHebrewDown(true);
+      }
+      
+      protected function onKeyClick(event: MouseEvent): void
+      {
+        // Translate button id to the correct keyboard code
+        var btn: Button = event.target as Button;
+        if (btn == null)
+          return;
+        
+        var key: Key = getKeyForBtn(btn);
+        if (key == null)
+          return;
+        
+        var cc: uint;
+        var translation: KeyTranslation;
+        if (_hebrewDown && (translation = getTranslation(key.code)))
+          cc = translation.value.charCodeAt(0);
+        else if (key.char)
+        {
+          if (_shiftDown)
+            cc = key.shiftChar.charCodeAt(0)
+          else
+            cc = key.char.charCodeAt(0);
+        }
+        else
+          cc = 0;
+        
+        dispatchEvent(new KeyboardEvent(KeyboardEvent.KEY_DOWN, true, false,
+          cc, key.code, 0,  false, false, _shiftDown));
+        //        dispatchEvent(new KeyboardEvent(KeyboardEvent.KEY_UP, true, false,
+        //          cc, key.code, 0,  false, false, _shiftDown, false, false));
+      }
+      
+      protected function onShiftClick(event:MouseEvent):void
+      {
+        _shiftDown = btn_SHIFT.selected;
+        
+        var ix: uint;
+        var key: Key;
+        var lbl: String;
+        
+        for (ix = 0; ix < _keys.length; ix++)
+        {
+          key = _keys[ix];
+          if (key.shiftable)
+          {
+            if (key.shiftChar == null)
+            {
+              lbl = key.button.label;
+              key.button.label = _shiftDown ? lbl.toUpperCase() : lbl.toLowerCase();
+            }
+            else {
+              key.button.label = _shiftDown ? key.shiftChar: key.char;
+            }
+          }
+        }
+      }
+      
+      protected function getTranslation(keyCode: uint): KeyTranslation
+      {
+        var ix: uint;
+        var translation: KeyTranslation;
+        
+        for (ix = 0; ix < _hebrewKeys.length; ix++) {
+          translation = _hebrewKeys[ix];
+          if (translation.code == keyCode)
+            return translation;
+        }
+        return null;
+      }
+      
+      protected function setHebrewDown(value: Boolean): void
+      {
+        var ix: uint;
+        var key: Key;
+        var lbl: String;
+        var translation: KeyTranslation;
+        
+        _hebrewDown = value;
+        btn_LANG.label = _hebrewDown ? "En" : "א";
+        
+        if (_hebrewDown)
+          dispatchEvent(new LanguageEvent(LanguageEvent.LANGUAGE_CHANGED, false, false, LanguageEvent.HE));
+        else {
+          dispatchEvent(new LanguageEvent(LanguageEvent.LANGUAGE_CHANGED, false, false, LanguageEvent.EN));
+        }
+        
+        _shiftDown = false;
+        btn_SHIFT.selected = false;
+        btn_SHIFT.enabled = !_hebrewDown;
+        
+        for (ix = 0; ix < _keys.length; ix++)
+        {       
+          key = _keys[ix];
+          if (key.shiftable) 
+          {
+            if (_hebrewDown) {
+              translation = getTranslation(key.code);
+            }
+            else 
+              translation = null;
+            
+            if (translation) {
+              lbl = translation.value;
+            }
+            else {
+              lbl = key.char;
+            }
+            key.button.label = lbl;
+          }
+        }       
+      }
+      
+      protected function btn_LANG_onClick(event: MouseEvent): void
+      {
+        setHebrewDown(btn_LANG.selected);
+      }
+      
+      public function get keys():Vector.<Key>
+      {
+        return _keys;
+      }
+      
+      public function get hebrewKeys():Vector.<KeyTranslation>
+      {
+        return _hebrewKeys;
+      }
+      
+      public function getKeyForBtn(btn: Button): Key
+      {
+        var ix: uint;
+        var key: Key;
+        
+        for (ix = 0; ix < _keys.length; ix++)
+        {
+          key = _keys[ix];
+          if (key.button == btn)
+            return key;
+        }
+        return null;
+      }     
+      
+      public function getKey(code: uint): Key
+      {
+        var ix: uint;
+        var key: Key;
+        
+        for (ix = 0; ix < _keys.length; ix++)
+        {
+          key = _keys[ix];
+          if (key.code == code)
+            return key;
+        }
+        return null;
+      }
+      
+      public static function translateEventForEditableText(event: KeyboardEvent): Event
+      {
+        // Translate the KeyboardEvent to a TextEvent if there is a usuable character code
+        var evt: Event;
+        if (event.charCode > 0)
+          evt = new TextEvent(TextEvent.TEXT_INPUT, false, false, String.fromCharCode(event.charCode));  
+        else
+          evt = event;
+        
+        return evt;
+      }
+      
+      /**
+       * NOTE: This is a modified version of SparkRichEditableTextAutomationHelper.replayAutomatableEvent 
+       * from spark.automation.delegates.
+       * 
+       *  Replays TextEvens, Selection Event, and type events. TypeEvents  and Text events are replayed
+       *  depending on the character typed.  Both  dispatches the origin keystrokes.
+       *  This is necessary to mimic the original behavior, in case any components are
+       *  listening to keystroke events (for example, DataGrid listens to itemRenderer events,
+       *  or if a custom component is trying to do key masking).  In Halo, the text events were changing
+       *  the contents using the text related methods as the flash player was ignoring the key evens.
+       *  In Gumbo this is not the case, so for the text and type events, we need only to send the key strokes.
+       *  dispatch the original keystrokes, but the Flash Player richEditableText ignores
+       *  the events we are sending it.
+       *
+       * @param event Event to replay.
+       * 
+       * @return If true, replay the event.
+       *  
+       *  @langversion 3.0
+       *  @playerversion Flash 9
+       *  @playerversion AIR 1.1
+       *  @productversion Flex 4
+       */
+      public static function replayRichTextEvent(richEditableText: RichEditableText, event: Event): Boolean
+      {
+        if ((richEditableText == null) || (event == null))
+          return false;
+        
+        var changeEvent: TextOperationEvent = new TextOperationEvent(TextOperationEvent.CHANGE);
+        
+        var sm:ISystemManager = Automation.getMainApplication().systemManager;
+        var help:IAutomationObjectHelper = Automation.automationObjectHelper;
+        
+        var ke:KeyboardEvent;
+        
+        if (event is TextSelectionEvent)
+        {
+          richEditableText.setFocus();
+          
+          // selection replay is done by calling the underlying select method.
+          // recorded value is anchorPosition and active position in order.
+          // Since we have used the existing TextSelection
+          var selectionEvent: TextSelectionEvent = TextSelectionEvent(event);
+          richEditableText.selectRange(selectionEvent.beginIndex, selectionEvent.endIndex);
+          
+          return true;
+        }
+        else if (event is TextEvent)
+        {
+          richEditableText.setFocus();
+          
+          var textEvent:TextEvent = TextEvent(event);
+          var text:String = textEvent.text;
+          var n:int = textEvent.text.length;
+          if(n == 0)
+          {
+            // if there is any selection we want
+            // to clear it, as this recording would have
+            // been resulted from cut operation. 
+            richEditableText.insertText("");
+          }
+          
+          // it was seen that at times event dispathing does not change
+          // the string and at times it changes.
+          // refer http://bugs.adobe.com/jira/browse/FLEXENT-1179
+          // We need to insert the text if the change has not happened.
+          // for this we need to find the string before and after the event dispatch.
+          // but the text does not display the correct value after the event dispatch. It shows
+          // only after we do an insert operation on the text after the same.
+          // but to do the inser operation, we need to find the active and anchor position also.
+          // this also does not change when the value is dispatched and still is at the beginning of the string.
+          // so we need to calcualte it. Here we need to consider the direction.
+          var stringBeforeChange:String = richEditableText.text;
+          var insertPos:int = richEditableText.selectionActivePosition;
+          var activePos:int = insertPos;
+          var anchorPos:int = richEditableText.selectionAnchorPosition;
+          var direction:int = -1;
+          if (richEditableText && richEditableText.textFlow && richEditableText.textFlow.computedFormat &&
+            richEditableText.textFlow.computedFormat.direction)
+          {
+            if (richEditableText.textFlow.computedFormat.direction=="ltr")
+              direction = 1;
+          }
+          richEditableText.selectRange(anchorPos, activePos);
+          for (var i:uint = 0; i < n; i++)
+          {
+            ke = new KeyboardEvent(KeyboardEvent.KEY_DOWN);
+            ke.charCode = text.charCodeAt(i);
+            ke.keyCode = text.charCodeAt(i);
+            richEditableText.dispatchEvent(ke);
+            
+            // we dont need any special handling on the string.
+            // replaying the key board events takes care of the needed.
+            // however when there is a line feed or carriage return , we need to handle it specially
+            if((text.charAt(i) == "\n") || (text.charAt(i) == "\r"))
+              richEditableText.insertText(text.charAt(i));
+            
+            var te:TextEvent = new TextEvent(TextEvent.TEXT_INPUT);
+            te.text = String(text.charAt(i)); 
+            // ref. http://bugs.adobe.com/jira/browse/FLEXENT-838 - charcode vs charAt
+            richEditableText.dispatchEvent(te);
+            // we dont need to select as the previous selection would have taken care of the 
+            // requried selection
+            
+            ke = new KeyboardEvent(KeyboardEvent.KEY_UP);
+            ke.charCode = text.charCodeAt(i);
+            ke.keyCode = text.charCodeAt(i);
+            richEditableText.dispatchEvent(ke);
+            
+            // dispatch a change event to indicate that the value is changed.
+            richEditableText.dispatchEvent(changeEvent);
+            // calculate the new insert position.
+            insertPos += 1;
+          }
+          
+          if (text.length > 0)
+          {
+            // do the operation to reflect the text value
+            richEditableText.selectRange(insertPos, insertPos);
+            richEditableText.insertText("");
+            
+            // check whethr the string is changed after the event dispatch
+            // refer http://bugs.adobe.com/jira/browse/FLEXENT-1179
+            var stringAfterChange:String = richEditableText.text;
+            
+            if (stringBeforeChange == stringAfterChange)
+            {
+              richEditableText.insertText(text);
+            }
+          }
+          
+          return true;
+        }
+        else if (event is KeyboardEvent)
+        {
+          var kbEvent: KeyboardEvent = KeyboardEvent(event);
+          var keyCode:int = kbEvent.keyCode;
+          switch (keyCode)
+          {
+            case Keyboard.HOME:
+              // replaying the keyboard events will do what's needed
+              break;
+            case Keyboard.END:
+              // replaying the keyboard events will do what's needed
+              break;
+            case Keyboard.ENTER:
+              // replaying the keyboard events will do what's needed
+              break;
+            case Keyboard.BACKSPACE:
+              // replaying the keyboard events will do what's needed
+              break;
+            case Keyboard.DELETE:
+              // replaying the keyboard events will do what's needed
+              break;
+            case Keyboard.INSERT:
+              isInInsertMode = !isInInsertMode;
+              break;
+            case Keyboard.ESCAPE:
+              // replaying the keyboard events will do what's needed
+              break;
+            default:
+              var message: String = "Event is not replayable, for keycode: " + keyCode;
+              throw new Error(message);
+          }
+          
+          ke = new KeyboardEvent(KeyboardEvent.KEY_DOWN);
+          ke.charCode = keyCode;
+          ke.keyCode = keyCode;
+          ke.ctrlKey = kbEvent.ctrlKey;
+          ke.shiftKey = kbEvent.shiftKey;
+          ke.altKey = kbEvent.altKey;
+          
+          richEditableText.dispatchEvent(ke);
+          
+          ke = new KeyboardEvent(KeyboardEvent.KEY_UP);
+          ke.charCode = keyCode;
+          ke.keyCode = keyCode;
+          ke.ctrlKey = kbEvent.ctrlKey;
+          ke.shiftKey = kbEvent.shiftKey;
+          ke.altKey = kbEvent.altKey;
+          
+          richEditableText.dispatchEvent(ke);
+          
+          richEditableText.dispatchEvent(changeEvent);
+          return true;
+        }
+        return false;
+      }
+    ]]>
+  </fx:Script>
+  
+  <s:Rect id="rectBackground" width="100%" height="100%">
+    <s:fill>
+      <s:LinearGradient rotation="90">
+        <s:GradientEntry color="0xA0A8B1"/>
+        <s:GradientEntry color="0x56616F"/>
+      </s:LinearGradient>
+    </s:fill>
+  </s:Rect>
+  
+  <s:Group id="grpContainer" left="20" top="20" right="20" bottom="20">
+    <s:VGroup width="100%" height="100%" gap="0" horizontalAlign="center" requestedRowCount="4">
+      <s:HGroup id="hgRow1" width="100%" height="20%" gap="10" paddingBottom="15" paddingLeft="20"
+                paddingRight="20" verticalAlign="contentJustify">
+        <s:Button id="btn_1" skinClass="com.flexcomps.virtualKeyboard.OpaqueButton" width="100%" height="100%" label="1"
+                  cornerRadius="7" click="onKeyClick(event)"/>
+        <s:Button id="btn_2" skinClass="com.flexcomps.virtualKeyboard.OpaqueButton" width="100%" height="100%" label="2"
+                  cornerRadius="7" click="onKeyClick(event)"/>
+        <s:Button id="btn_3" skinClass="com.flexcomps.virtualKeyboard.OpaqueButton" width="100%" height="100%" label="3"
+                  cornerRadius="7" click="onKeyClick(event)"/>
+        <s:Button id="btn_4" skinClass="com.flexcomps.virtualKeyboard.OpaqueButton" width="100%" height="100%" label="4"
+                  cornerRadius="7" click="onKeyClick(event)"/>
+        <s:Button id="btn_5" skinClass="com.flexcomps.virtualKeyboard.OpaqueButton" width="100%" height="100%" label="5"
+                  cornerRadius="7" click="onKeyClick(event)"/>
+        <s:Button id="btn_6" skinClass="com.flexcomps.virtualKeyboard.OpaqueButton" width="100%" height="100%" label="6"
+                  cornerRadius="7" click="onKeyClick(event)"/>
+        <s:Button id="btn_7" skinClass="com.flexcomps.virtualKeyboard.OpaqueButton" width="100%" height="100%" label="7"
+                  cornerRadius="7" click="onKeyClick(event)"/>
+        <s:Button id="btn_8" skinClass="com.flexcomps.virtualKeyboard.OpaqueButton" width="100%" height="100%" label="8"
+                  cornerRadius="7" click="onKeyClick(event)"/>
+        <s:Button id="btn_9" skinClass="com.flexcomps.virtualKeyboard.OpaqueButton" width="100%" height="100%" label="9"
+                  cornerRadius="7" click="onKeyClick(event)"/>
+        <s:Button id="btn_0" skinClass="com.flexcomps.virtualKeyboard.OpaqueButton" width="100%" height="100%" label="0"
+                  cornerRadius="7" click="onKeyClick(event)"/>
+        <s:Button id="btn_MINUS" skinClass="com.flexcomps.virtualKeyboard.OpaqueButton" width="100%" height="100%" label="-"
+                  cornerRadius="7" click="onKeyClick(event)"/>
+        <s:Button id="btn_EQUAL" skinClass="com.flexcomps.virtualKeyboard.OpaqueButton" width="100%" height="100%" label="="
+                  cornerRadius="7" click="onKeyClick(event)"/>
+      </s:HGroup>
+      <s:HGroup id="hgRow2" width="100%" height="21%" gap="14" paddingBottom="10" verticalAlign="contentJustify">
+        <s:Button id="btn_Q" skinClass="com.flexcomps.virtualKeyboard.OpaqueButton" width="100%" height="100%" label="q"
+                  cornerRadius="7" click="onKeyClick(event)"/>
+        <s:Button id="btn_W" skinClass="com.flexcomps.virtualKeyboard.OpaqueButton" width="100%" height="100%" label="w"
+                  cornerRadius="7" click="onKeyClick(event)"/>
+        <s:Button id="btn_E" skinClass="com.flexcomps.virtualKeyboard.OpaqueButton" width="100%" height="100%" label="e"
+                  cornerRadius="7" click="onKeyClick(event)"/>
+        <s:Button id="btn_R" skinClass="com.flexcomps.virtualKeyboard.OpaqueButton" width="100%" height="100%" label="r"
+                  cornerRadius="7" click="onKeyClick(event)"/>
+        <s:Button id="btn_T" skinClass="com.flexcomps.virtualKeyboard.OpaqueButton" width="100%" height="100%" label="t"
+                  cornerRadius="7" click="onKeyClick(event)"/>
+        <s:Button id="btn_Y" skinClass="com.flexcomps.virtualKeyboard.OpaqueButton" width="100%" height="100%" label="y"
+                  cornerRadius="7" click="onKeyClick(event)"/>
+        <s:Button id="btn_U" skinClass="com.flexcomps.virtualKeyboard.OpaqueButton" width="100%" height="100%" label="u"
+                  cornerRadius="7" click="onKeyClick(event)"/>
+        <s:Button id="btn_I" skinClass="com.flexcomps.virtualKeyboard.OpaqueButton" width="100%" height="100%" label="i"
+                  cornerRadius="7" click="onKeyClick(event)"/>
+        <s:Button id="btn_O" skinClass="com.flexcomps.virtualKeyboard.OpaqueButton" width="100%" height="100%" label="o"
+                  cornerRadius="7" click="onKeyClick(event)"/>
+        <s:Button id="btn_P" skinClass="com.flexcomps.virtualKeyboard.OpaqueButton" width="100%" height="100%" label="p"
+                  cornerRadius="7" click="onKeyClick(event)"/>
+      </s:HGroup>
+      <s:HGroup id="hgRow3" width="100%" height="21%" gap="12" paddingBottom="10" paddingLeft="12"
+                paddingRight="12" verticalAlign="contentJustify">
+        <s:Button id="btn_A" skinClass="com.flexcomps.virtualKeyboard.OpaqueButton" width="100%" height="100%" label="a"
+                  cornerRadius="7" click="onKeyClick(event)" />
+        <s:Button id="btn_S" skinClass="com.flexcomps.virtualKeyboard.OpaqueButton" width="100%" height="100%" label="s"
+                  cornerRadius="7" click="onKeyClick(event)" />
+        <s:Button id="btn_D" skinClass="com.flexcomps.virtualKeyboard.OpaqueButton" width="100%" height="100%" label="d"
+                  cornerRadius="7" click="onKeyClick(event)" />
+        <s:Button id="btn_F" skinClass="com.flexcomps.virtualKeyboard.OpaqueButton" width="100%" height="100%" label="f"
+                  cornerRadius="7" click="onKeyClick(event)" />
+        <s:Button id="btn_G" skinClass="com.flexcomps.virtualKeyboard.OpaqueButton" width="100%" height="100%" label="g"
+                  cornerRadius="7" click="onKeyClick(event)" />
+        <s:Button id="btn_H" skinClass="com.flexcomps.virtualKeyboard.OpaqueButton" width="100%" height="100%" label="h"
+                  cornerRadius="7" click="onKeyClick(event)" />
+        <s:Button id="btn_J" skinClass="com.flexcomps.virtualKeyboard.OpaqueButton" width="100%" height="100%" label="j"
+                  cornerRadius="7" click="onKeyClick(event)" />
+        <s:Button id="btn_K" skinClass="com.flexcomps.virtualKeyboard.OpaqueButton" width="100%" height="100%" label="k"
+                  cornerRadius="7" click="onKeyClick(event)" />
+        <s:Button id="btn_L" skinClass="com.flexcomps.virtualKeyboard.OpaqueButton" width="100%" height="100%" label="l"
+                  cornerRadius="7" click="onKeyClick(event)" />
+        <s:Button id="btn_SEMICOLON" skinClass="com.flexcomps.virtualKeyboard.OpaqueButton" width="100%" height="100%" label=";"
+                  cornerRadius="7" click="onKeyClick(event)" />
+        <s:Button id="btn_QUOTE" width="100%" height="100%" label="'" click="onKeyClick(event)"
+                  cornerRadius="7" fontWeight="normal" skinClass="com.flexcomps.virtualKeyboard.OpaqueButton"/>
+      </s:HGroup>
+      <s:HGroup id="hgRow4" width="100%" height="22%" gap="10" paddingBottom="15" paddingLeft="20"
+                paddingRight="20" verticalAlign="contentJustify">
+        <s:Button id="btn_Z" skinClass="com.flexcomps.virtualKeyboard.OpaqueButton" width="100%" height="100%" label="z"
+                  cornerRadius="7" click="onKeyClick(event)" />
+        <s:Button id="btn_X" skinClass="com.flexcomps.virtualKeyboard.OpaqueButton" width="100%" height="100%" label="x"
+                  cornerRadius="7" click="onKeyClick(event)" />
+        <s:Button id="btn_C" skinClass="com.flexcomps.virtualKeyboard.OpaqueButton" width="100%" height="100%" label="c"
+                  cornerRadius="7" click="onKeyClick(event)" />
+        <s:Button id="btn_V" skinClass="com.flexcomps.virtualKeyboard.OpaqueButton" width="100%" height="100%" label="v"
+                  cornerRadius="7" click="onKeyClick(event)" />
+        <s:Button id="btn_B" skinClass="com.flexcomps.virtualKeyboard.OpaqueButton" width="100%" height="100%" label="b"
+                  cornerRadius="7" click="onKeyClick(event)" />
+        <s:Button id="btn_N" skinClass="com.flexcomps.virtualKeyboard.OpaqueButton" width="100%" height="100%" label="n"
+                  cornerRadius="7" click="onKeyClick(event)" />
+        <s:Button id="btn_M" skinClass="com.flexcomps.virtualKeyboard.OpaqueButton" width="100%" height="100%" label="m"
+                  cornerRadius="7" click="onKeyClick(event)" />
+        <s:Button id="btn_COMMA" skinClass="com.flexcomps.virtualKeyboard.OpaqueButton" width="100%" height="100%" label=","
+                  cornerRadius="7" click="onKeyClick(event)" />
+        <s:Button id="btn_PERIOD" skinClass="com.flexcomps.virtualKeyboard.OpaqueButton" width="100%" height="100%" label="."
+                  cornerRadius="7" click="onKeyClick(event)" />
+        <s:Button id="btn_SLASH" skinClass="com.flexcomps.virtualKeyboard.OpaqueButton" width="100%" height="100%" label="/"
+                  cornerRadius="7" click="onKeyClick(event)" />
+        <s:Button id="btn_ENTER" height="100%" label="enter" click="onKeyClick(event)"
+                  cornerRadius="7" fontWeight="normal"/>
+      </s:HGroup>
+      <s:HGroup id="hgRow5" width="100%" height="16%" gap="18" paddingBottom="0" verticalAlign="justify">
+        <s:ToggleButton id="btn_SHIFT" width="10%" height="100%" label="⌂" chromeColor="#69737F"
+                        click="onShiftClick(event)" cornerRadius="7" fontWeight="normal"
+                        skinClass="com.flexcomps.virtualKeyboard.OpaqueToggleButton"/>
+        <s:Button id="btn_SPACE" width="65%" height="100%" label="space" click="onKeyClick(event)"
+                  cornerRadius="7" fontWeight="bold" skinClass="com.flexcomps.virtualKeyboard.OpaqueButton"/>
+        <s:Button id="btn_BACKSPACE" width="15%" height="100%" label="←" chromeColor="#69737F"
+                  click="onKeyClick(event)" cornerRadius="7" fontWeight="normal"
+                  skinClass="com.flexcomps.virtualKeyboard.OpaqueButton"/>
+        <s:ToggleButton id="btn_LANG" width="10%" height="100%" label="En" chromeColor="#69737F"
+                        click="btn_LANG_onClick(event)" cornerRadius="7" fontWeight="bold"
+                        selected="true" skinClass="com.flexcomps.virtualKeyboard.OpaqueToggleButton"/>
+      </s:HGroup>
+    </s:VGroup>
+  </s:Group>
 </s:Group>

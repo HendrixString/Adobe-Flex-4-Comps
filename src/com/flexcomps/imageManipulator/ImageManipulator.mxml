@@ -1,202 +1,202 @@
 <?xml version="1.0" encoding="utf-8"?>
 <s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
-				 xmlns:s="library://ns.adobe.com/flex/spark" 
-				 xmlns:mx="library://ns.adobe.com/flex/mx"
-				 creationComplete="onCreationCompleteHandler(event)">
-	
-	<fx:Script>
-		<![CDATA[
-			import com.greensock.TweenLite;
-			
-			import mx.events.FlexEvent;
-			
-			private static var ZOOM_DELTA:				 	Number = 0.2;
-			private static var ANGLE_DELTA:			 		Number = 20;
-			private static var TIME_IN_ANIMATION: 	Number = 0.3;
-
-			// accumalative transformation data (no Matrix rep)
-			private var _rotationAngle:							Number 	= 0;
-			private var _translationAnchor:					Point		=	null;
-			private var _zoom:											Number	=	1;
-			
-			//Mouse Variables
-			private var _delta: 										Point		=	null;
-			private var _mouseLastXY:								Point		=	null;
-			private var _mouseDown:									Boolean	=	false;
-			
-			// states
-			public var isRotating:									Boolean	=	false;
-			public var isScaling:										Boolean	=	false;
-
-			private function onCreationCompleteHandler(event:FlexEvent):void
-			{
-				_rotationAngle 			= 0;
-				_zoom 							= 1;
-				img.x 							= 0;
-				img.y 							= 0;
-		
-				addEventListener(MouseEvent.MOUSE_DOWN, onMouseDown, 	false, 0, false);
-				addEventListener(MouseEvent.MOUSE_MOVE, onMouseMove, 	false, 0, false);
-				addEventListener(MouseEvent.MOUSE_UP, 	onMouseUp, 		false, 0, false);
-				addEventListener(MouseEvent.MOUSE_OUT, 	onMouseOut, 	false, 0, false);
-
-				_delta 								= new Point();
-			}
-			
-			private function onImageReady(event:FlexEvent):void
-			{
-				reset();
-			}
-			
-			private function updateTransform():void
-			{
-				applyTransform();				
-			}
-			
-			private function applyTransform():void
-			{
-				var radians:			Number 							= degreesToRadians(_rotationAngle);
-
-				var offsetWidthForRotation:		Number 	= img.width  / 2;
-				var offsetHeightForRotation:	Number 	= img.height / 2;
-				
-				var tempMatrix:								Matrix 	= new Matrix();
-				
-				// rotation pivoted at center
-				tempMatrix.translate(-offsetWidthForRotation, -offsetHeightForRotation);
-				
-				// scale
-				tempMatrix.scale(_zoom, _zoom);
-
-				tempMatrix.rotate(radians);
-				
-				tempMatrix.translate(+offsetWidthForRotation, +offsetHeightForRotation);
-				
-				// translation
-				tempMatrix.translate(_translationAnchor.x, _translationAnchor.y);
-
-				img.transform.matrix 									= tempMatrix;
-			}
-			
-			private function radiansToDegrees(radians:Number):Number {
-				var degrees:	Number = radians * (180 / Math.PI);
-				return degrees;
-			}
-			private function degreesToRadians(degrees:Number):Number {
-				var radians:	Number = degrees * (Math.PI / 180);
-				return radians;
-			}
-			
-			private function onMouseMove(event:MouseEvent):void
-			{
-				if (_mouseDown == false)
-					return;
-								
-				if (_mouseLastXY	==	null)	{
-					_mouseLastXY						=	new Point();
-					_delta									=	new Point();
-				}
-				else	{
-					_delta.x 								= _mouseLastXY.x - event.stageX;
-					_delta.y 								= _mouseLastXY.y - event.stageY;
-				}
-				
-				_mouseLastXY.x	  				= event.stageX;
-				_mouseLastXY.y	 					= event.stageY;
-				
-				_translationAnchor.x 	 		-= _delta.x;
-				_translationAnchor.y 	 		-= _delta.y;
-
-				updateTransform();
-			}
-			
-			private function onMouseUp(event:MouseEvent):	void	{
-				_mouseDown	=	false;
-			}
-			private function onMouseDown(event:MouseEvent):	void	{
-				_mouseLastXY	=	null;
-				_mouseDown		=	true;
-			}
-			private function onMouseOut(event:MouseEvent):void	{
-				_mouseDown	=	false;				
-			}
-
-			private function onCompleteAnimation():void
-			{
-				isScaling 	= false;
-				isRotating  = false;
-			}
-
-			/**
-			 * public interface 
-			 */
-			
-			public function get zoom():Number	{
-				return _zoom;
-			}
-			public function set zoom(value:Number):void	{
-				_zoom = value;
-			}
-
-			public function get rotationAngle():Number	{
-				return _rotationAngle;
-			}
-			public function set rotationAngle(value:Number):void	{
-				_rotationAngle = value;
-			}
-			
-			public function updateImage(source:Object):void
-			{
-				img.source	=	null;
-				img.source	=	source;
-			}
-			
-			public function reset():void
-			{
-				_rotationAngle 				= 0;
-				
-				if(_translationAnchor == null)
-					_translationAnchor 	= new Point();
-				
-				_translationAnchor.x 	= 0;
-				_translationAnchor.y 	= 0;
-				_zoom 								= 1;
-				
-				updateTransform();
-			}
-			
-			public function zoomIn():void	{
-				if(isScaling)
-					return;
-				isScaling	= true;
-				TweenLite.killTweensOf(this);
-				TweenLite.to(this, TIME_IN_ANIMATION, {zoom: zoom + ZOOM_DELTA, onUpdate: updateTransform, onComplete:onCompleteAnimation});
-			}
-			public function zoomOut():void	{
-				if(isScaling)
-					return;
-				isScaling 	= true;
-				TweenLite.killTweensOf(this);
-				TweenLite.to(this, TIME_IN_ANIMATION, {zoom: zoom - ZOOM_DELTA, onUpdate: updateTransform, onComplete:onCompleteAnimation});
-			}
-			
-			public function rotateRight():void	{
-				if(isRotating)
-					return;
-				isRotating	= true;
-				TweenLite.killTweensOf(this);
-				TweenLite.to(this, TIME_IN_ANIMATION, {rotationAngle: rotationAngle + ANGLE_DELTA, onUpdate: updateTransform, onComplete:onCompleteAnimation});
-			}
-			public function rotateLeft():void	{
-				if(isRotating)
-					return;
-				isRotating = true;
-				TweenLite.killTweensOf(this);
-				TweenLite.to(this, TIME_IN_ANIMATION, {rotationAngle: rotationAngle - ANGLE_DELTA, onUpdate: updateTransform, onComplete:onCompleteAnimation});
-			}
-			
-		]]>
-	</fx:Script>
-
-	<s:Image id="img" ready="onImageReady(event)" smooth="true"/>
+         xmlns:s="library://ns.adobe.com/flex/spark" 
+         xmlns:mx="library://ns.adobe.com/flex/mx"
+         creationComplete="onCreationCompleteHandler(event)">
+  
+  <fx:Script>
+    <![CDATA[
+      import com.greensock.TweenLite;
+      
+      import mx.events.FlexEvent;
+      
+      private static var ZOOM_DELTA:          Number = 0.2;
+      private static var ANGLE_DELTA:         Number = 20;
+      private static var TIME_IN_ANIMATION:   Number = 0.3;
+      
+      // accumalative transformation data (no Matrix rep)
+      private var _rotationAngle:             Number  = 0;
+      private var _translationAnchor:         Point   = null;
+      private var _zoom:                      Number  = 1;
+      
+      //Mouse Variables
+      private var _delta:                     Point   = null;
+      private var _mouseLastXY:               Point   = null;
+      private var _mouseDown:                 Boolean = false;
+      
+      // states
+      public var isRotating:                  Boolean = false;
+      public var isScaling:                   Boolean = false;
+      
+      private function onCreationCompleteHandler(event:FlexEvent):void
+      {
+        _rotationAngle      = 0;
+        _zoom               = 1;
+        img.x               = 0;
+        img.y               = 0;
+        
+        addEventListener(MouseEvent.MOUSE_DOWN, onMouseDown,  false, 0, false);
+        addEventListener(MouseEvent.MOUSE_MOVE, onMouseMove,  false, 0, false);
+        addEventListener(MouseEvent.MOUSE_UP,   onMouseUp,    false, 0, false);
+        addEventListener(MouseEvent.MOUSE_OUT,  onMouseOut,   false, 0, false);
+        
+        _delta                = new Point();
+      }
+      
+      private function onImageReady(event:FlexEvent):void
+      {
+        reset();
+      }
+      
+      private function updateTransform():void
+      {
+        applyTransform();       
+      }
+      
+      private function applyTransform():void
+      {
+        var radians:      Number              = degreesToRadians(_rotationAngle);
+        
+        var offsetWidthForRotation:   Number  = img.width  / 2;
+        var offsetHeightForRotation:  Number  = img.height / 2;
+        
+        var tempMatrix:               Matrix  = new Matrix();
+        
+        // rotation pivoted at center
+        tempMatrix.translate(-offsetWidthForRotation, -offsetHeightForRotation);
+        
+        // scale
+        tempMatrix.scale(_zoom, _zoom);
+        
+        tempMatrix.rotate(radians);
+        
+        tempMatrix.translate(+offsetWidthForRotation, +offsetHeightForRotation);
+        
+        // translation
+        tempMatrix.translate(_translationAnchor.x, _translationAnchor.y);
+        
+        img.transform.matrix                  = tempMatrix;
+      }
+      
+      private function radiansToDegrees(radians:Number):Number {
+        var degrees:  Number = radians * (180 / Math.PI);
+        return degrees;
+      }
+      private function degreesToRadians(degrees:Number):Number {
+        var radians:  Number = degrees * (Math.PI / 180);
+        return radians;
+      }
+      
+      private function onMouseMove(event:MouseEvent):void
+      {
+        if (_mouseDown == false)
+          return;
+        
+        if (_mouseLastXY  ==  null) {
+          _mouseLastXY            = new Point();
+          _delta                  = new Point();
+        }
+        else  {
+          _delta.x                = _mouseLastXY.x - event.stageX;
+          _delta.y                = _mouseLastXY.y - event.stageY;
+        }
+        
+        _mouseLastXY.x            = event.stageX;
+        _mouseLastXY.y            = event.stageY;
+        
+        _translationAnchor.x      -= _delta.x;
+        _translationAnchor.y      -= _delta.y;
+        
+        updateTransform();
+      }
+      
+      private function onMouseUp(event:MouseEvent): void  {
+        _mouseDown  = false;
+      }
+      private function onMouseDown(event:MouseEvent): void  {
+        _mouseLastXY  = null;
+        _mouseDown    = true;
+      }
+      private function onMouseOut(event:MouseEvent):void  {
+        _mouseDown  = false;        
+      }
+      
+      private function onCompleteAnimation():void
+      {
+        isScaling   = false;
+        isRotating  = false;
+      }
+      
+      /**
+       * public interface 
+       */
+      
+      public function get zoom():Number {
+        return _zoom;
+      }
+      public function set zoom(value:Number):void {
+        _zoom = value;
+      }
+      
+      public function get rotationAngle():Number  {
+        return _rotationAngle;
+      }
+      public function set rotationAngle(value:Number):void  {
+        _rotationAngle = value;
+      }
+      
+      public function updateImage(source:Object):void
+      {
+        img.source  = null;
+        img.source  = source;
+      }
+      
+      public function reset():void
+      {
+        _rotationAngle        = 0;
+        
+        if(_translationAnchor == null)
+          _translationAnchor  = new Point();
+        
+        _translationAnchor.x  = 0;
+        _translationAnchor.y  = 0;
+        _zoom                 = 1;
+        
+        updateTransform();
+      }
+      
+      public function zoomIn():void {
+        if(isScaling)
+          return;
+        isScaling = true;
+        TweenLite.killTweensOf(this);
+        TweenLite.to(this, TIME_IN_ANIMATION, {zoom: zoom + ZOOM_DELTA, onUpdate: updateTransform, onComplete:onCompleteAnimation});
+      }
+      public function zoomOut():void  {
+        if(isScaling)
+          return;
+        isScaling   = true;
+        TweenLite.killTweensOf(this);
+        TweenLite.to(this, TIME_IN_ANIMATION, {zoom: zoom - ZOOM_DELTA, onUpdate: updateTransform, onComplete:onCompleteAnimation});
+      }
+      
+      public function rotateRight():void  {
+        if(isRotating)
+          return;
+        isRotating  = true;
+        TweenLite.killTweensOf(this);
+        TweenLite.to(this, TIME_IN_ANIMATION, {rotationAngle: rotationAngle + ANGLE_DELTA, onUpdate: updateTransform, onComplete:onCompleteAnimation});
+      }
+      public function rotateLeft():void {
+        if(isRotating)
+          return;
+        isRotating = true;
+        TweenLite.killTweensOf(this);
+        TweenLite.to(this, TIME_IN_ANIMATION, {rotationAngle: rotationAngle - ANGLE_DELTA, onUpdate: updateTransform, onComplete:onCompleteAnimation});
+      }
+      
+    ]]>
+  </fx:Script>
+  
+  <s:Image id="img" ready="onImageReady(event)" smooth="true"/>
 </s:Group>

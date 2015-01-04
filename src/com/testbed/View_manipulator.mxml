@@ -1,77 +1,77 @@
 <?xml version="1.0" encoding="utf-8"?>
 <s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
-		 xmlns:s="library://ns.adobe.com/flex/spark" 
-		 xmlns:mx="library://ns.adobe.com/flex/mx" 
-		 xmlns:imageManipulator="com.flexcomps.imageManipulator.*"
-		 xmlns:splineContour="com.flexcomps.splineContour.*"
-		 width="100%" height="100%"
-		 creationComplete="onCreationCompleteHandler(event)"  
-		 >
-	
-	<fx:Script>
-		<![CDATA[
-			import com.flexcomps.splineContour.SplineContour;
-			
-			import mx.events.FlexEvent;
-			
-			[Embed(source="assets/dot.png")]
-			private var BtnUp:Class;
-			
-			[Embed(source="assets/dot_mark.png")]
-			private var BtnDown:Class;
-			
-			protected function onCreationCompleteHandler(event:FlexEvent):void
-			{
-				im.updateImage("assets/test.jpg");
-				
-				sc.bmpIconDown 				=	(new BtnDown() as Bitmap).bitmapData;
-				sc.bmpIconUp 					=	(new BtnUp() as Bitmap).bitmapData;
-				
-				sc.firstPoint 				= new Point(0, -50);
-				
-				sc.controlPoints 			= new <Point>[new Point(50,-50), 	new Point(50,50), new Point(-50,50), 	new Point(-50,-50)	];
-				
-				sc.anchorPoints	 			= new <Point>[new Point(50,0), 		new Point(0,50), 	new Point(-50,0), 	new Point(0,-50)		];
-			}
-			
-			private function onSplineShapeReady():void
-			{
-				im.mask = sc.splineShape;
-			}
-
-			protected function btnZoomIn_clickHandler(event:MouseEvent):void
-			{
-				im.zoomIn();
-			}
-			
-			protected function btnZoomOut_clickHandler(event:MouseEvent):void
-			{
-				im.zoomOut();				
-			}
-			
-			protected function btnRotateRight_clickHandler(event:MouseEvent):void
-			{
-				im.rotateRight();
-			}
-			
-			protected function btnRotateLeft_clickHandler(event:MouseEvent):void
-			{
-				im.rotateLeft();
-			}
-			
-		]]>
-	</fx:Script>
-	
-	<s:VGroup width="25%" height="25%" top="59">
-		<s:Group id="grpTest" height="100%" width="100%" clipAndEnableScrolling="false">
-			<imageManipulator:ImageManipulator id="im" width="500" height="500" maskType="luminosity"/>
-			<splineContour:SplineContour id="sc" width="500" height="500" top="0" onSplineShapeIsReady="{onSplineShapeReady}"/>
-		</s:Group>
-		<s:HGroup>
-			<s:Button id="btnZoomIn" 		label="zoomIn" click="btnZoomIn_clickHandler(event)"/>
-			<s:Button id="btnZoomOut" 		label="zoomOut" click="btnZoomOut_clickHandler(event)"/>
-			<s:Button id="btnRotateRight" 	label="rotate right" click="btnRotateRight_clickHandler(event)"/>
-			<s:Button id="btnRotateLeft" 	label="rotate left" click="btnRotateLeft_clickHandler(event)"/>
-		</s:HGroup>
-	</s:VGroup>
+         xmlns:s="library://ns.adobe.com/flex/spark" 
+         xmlns:mx="library://ns.adobe.com/flex/mx" 
+         xmlns:imageManipulator="com.flexcomps.imageManipulator.*"
+         xmlns:splineContour="com.flexcomps.splineContour.*"
+         width="100%" height="100%"
+         creationComplete="onCreationCompleteHandler(event)"  
+         >
+  
+  <fx:Script>
+    <![CDATA[
+      import com.flexcomps.splineContour.SplineContour;
+      
+      import mx.events.FlexEvent;
+      
+      [Embed(source="assets/dot.png")]
+      private var BtnUp:Class;
+      
+      [Embed(source="assets/dot_mark.png")]
+      private var BtnDown:Class;
+      
+      protected function onCreationCompleteHandler(event:FlexEvent):void
+      {
+        im.updateImage("assets/test.jpg");
+        
+        sc.bmpIconDown        = (new BtnDown() as Bitmap).bitmapData;
+        sc.bmpIconUp          = (new BtnUp() as Bitmap).bitmapData;
+        
+        sc.firstPoint         = new Point(0, -50);
+        
+        sc.controlPoints      = new <Point>[new Point(50,-50),  new Point(50,50), new Point(-50,50),  new Point(-50,-50)  ];
+        
+        sc.anchorPoints       = new <Point>[new Point(50,0),    new Point(0,50),  new Point(-50,0),   new Point(0,-50)    ];
+      }
+      
+      private function onSplineShapeReady():void
+      {
+        im.mask = sc.splineShape;
+      }
+      
+      protected function btnZoomIn_clickHandler(event:MouseEvent):void
+      {
+        im.zoomIn();
+      }
+      
+      protected function btnZoomOut_clickHandler(event:MouseEvent):void
+      {
+        im.zoomOut();       
+      }
+      
+      protected function btnRotateRight_clickHandler(event:MouseEvent):void
+      {
+        im.rotateRight();
+      }
+      
+      protected function btnRotateLeft_clickHandler(event:MouseEvent):void
+      {
+        im.rotateLeft();
+      }
+      
+    ]]>
+  </fx:Script>
+  
+  <s:VGroup width="25%" height="25%" top="59">
+    <s:Group id="grpTest" height="100%" width="100%" clipAndEnableScrolling="false">
+      <imageManipulator:ImageManipulator id="im" width="500" height="500" maskType="luminosity"/>
+      <splineContour:SplineContour id="sc" width="500" height="500" top="0" onSplineShapeIsReady="{onSplineShapeReady}"/>
+    </s:Group>
+    <s:HGroup>
+      <s:Button id="btnZoomIn"    label="zoomIn" click="btnZoomIn_clickHandler(event)"/>
+      <s:Button id="btnZoomOut"     label="zoomOut" click="btnZoomOut_clickHandler(event)"/>
+      <s:Button id="btnRotateRight"   label="rotate right" click="btnRotateRight_clickHandler(event)"/>
+      <s:Button id="btnRotateLeft"  label="rotate left" click="btnRotateLeft_clickHandler(event)"/>
+    </s:HGroup>
+  </s:VGroup>
 </s:Group>

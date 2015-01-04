@@ -1,121 +1,121 @@
 <?xml version="1.0" encoding="utf-8"?>
 <s:SparkButtonSkin xmlns:fx="http://ns.adobe.com/mxml/2009"
-									 xmlns:s="library://ns.adobe.com/flex/spark"
-									 xmlns:fb="http://ns.adobe.com/flashbuilder/2009"
-									 minWidth="21" minHeight="21"
-									 alpha.disabled="0.5"
-									 creationComplete="onCreationComplete(event)">
-	
-	<fx:Metadata>
-		<![CDATA[ 
-		/** 
-		* @copy spark.skins.spark.ApplicationSkin#hostComponent
-		*/
-		[HostComponent("com.flexcomps.bitmapButton.BitmapButton")]
-		]]>
-	</fx:Metadata>
-	
-	<fx:Script fb:purpose="styling">
-		<![CDATA[
-			
-			import mx.events.FlexEvent;
-			/* Define the skin elements that should not be colorized.
-			For button, the graphics are colorized but the label is not. */
-			static private const exclusions: Array = ["labelDisplay"];
-			
-			protected function show(bi: BitmapImage): void
-			{
-				bi.visible = true;
-				bi.includeInLayout = true;
-
-				if(bi != biUp){
-					biUp.visible = false;
-					biUp.includeInLayout = false;
-				}
-				if(bi != biOver){
-					biOver.visible = false;
-				  biOver.includeInLayout = false;
-				}
-				if(bi != biDown){
-					biDown.visible = false;
-					biDown.includeInLayout = false;
-				}
-				if(bi != biDisabled){
-					biDisabled.visible = false;
-					biDisabled.includeInLayout = false;
-				}
-				
-			}
-			
-			protected function hide(bi: BitmapImage): void
-			{
-				bi.visible = false;
-				bi.includeInLayout = false;
-			}
-			
-			protected function onCreationComplete(event: FlexEvent): void
-			{
-				show(biUp);
-				hide(biOver);
-				hide(biDown);
-				hide(biDisabled);
-			}
-			
-			override protected function updateDisplayList(unscaledWidth: Number, unscaledHeight: Number) : void
-			{
-				super.updateDisplayList(unscaledWidth, unscaledHeight);
-			}
-			
-			override protected function initializationComplete(): void
-			{
-				super.initializationComplete();
-			}
-			
-			public function changeState2($state:String):void
-			{
-				stateChanged(null, $state, true);
-			}
-			
-			override protected function stateChanged(oldState:String, newState:String, recursive:Boolean):void
-			{
-				//super.stateChanged(oldState, newState, recursive);
-				
-				var host: BitmapButton = hostComponent as BitmapButton;
-				if (host == null)
-					return;
-				
-				biUp.source				= host.srcUp;
-				biOver.source			= host.srcOver; 
-				biDown.source			= host.srcDown;
-				biDisabled.source	= host.srcDisabled;
-				
-				switch (newState)
-				{
-					case "up":				biUp.source				= host.srcUp; show(biUp); break;
-					case "over":			
-						biOver.source			= host.srcOver; 
-						show(biOver); 
-						break;
-					case "down": 			biDown.source			= host.srcDown; show(biDown); break;
-					case "disabled":	biDisabled.source	= host.srcDisabled ; show(biDisabled); break;
-				}
-
-				//conf::debug{at(arguments);}
-			}
-			
-		]]>
-	</fx:Script>
-	
-	<!-- states -->
-	<s:states>
-		<s:State name="up"/>
-		<s:State name="over"/>
-		<s:State name="down"/>
-		<s:State name="disabled"/>
-	</s:states>
-	
-	<s:BitmapImage id="biUp" width="100%" height="100%" alwaysCreateDisplayObject="false" clearOnLoad="true" smooth="true" />
-	<s:BitmapImage id="biOver" width="100%" height="100%" alwaysCreateDisplayObject="false" clearOnLoad="true" smooth="true" />
-	<s:BitmapImage id="biDown" width="100%" height="100%" alwaysCreateDisplayObject="false" clearOnLoad="true" smooth="true" />
-	<s:BitmapImage id="biDisabled" width="100%" height="100%" alwaysCreateDisplayObject="false" clearOnLoad="true" smooth="true" />
+                   xmlns:s="library://ns.adobe.com/flex/spark"
+                   xmlns:fb="http://ns.adobe.com/flashbuilder/2009"
+                   minWidth="21" minHeight="21"
+                   alpha.disabled="0.5"
+                   creationComplete="onCreationComplete(event)">
+  
+  <fx:Metadata>
+    <![CDATA[ 
+    /** 
+    * @copy spark.skins.spark.ApplicationSkin#hostComponent
+    */
+    [HostComponent("com.flexcomps.bitmapButton.BitmapButton")]
+    ]]>
+  </fx:Metadata>
+  
+  <fx:Script fb:purpose="styling">
+    <![CDATA[
+      
+      import mx.events.FlexEvent;
+      /* Define the skin elements that should not be colorized.
+      For button, the graphics are colorized but the label is not. */
+      static private const exclusions: Array = ["labelDisplay"];
+      
+      protected function show(bi: BitmapImage): void
+      {
+        bi.visible = true;
+        bi.includeInLayout = true;
+        
+        if(bi != biUp){
+          biUp.visible = false;
+          biUp.includeInLayout = false;
+        }
+        if(bi != biOver){
+          biOver.visible = false;
+          biOver.includeInLayout = false;
+        }
+        if(bi != biDown){
+          biDown.visible = false;
+          biDown.includeInLayout = false;
+        }
+        if(bi != biDisabled){
+          biDisabled.visible = false;
+          biDisabled.includeInLayout = false;
+        }
+        
+      }
+      
+      protected function hide(bi: BitmapImage): void
+      {
+        bi.visible = false;
+        bi.includeInLayout = false;
+      }
+      
+      protected function onCreationComplete(event: FlexEvent): void
+      {
+        show(biUp);
+        hide(biOver);
+        hide(biDown);
+        hide(biDisabled);
+      }
+      
+      override protected function updateDisplayList(unscaledWidth: Number, unscaledHeight: Number) : void
+      {
+        super.updateDisplayList(unscaledWidth, unscaledHeight);
+      }
+      
+      override protected function initializationComplete(): void
+      {
+        super.initializationComplete();
+      }
+      
+      public function changeState2($state:String):void
+      {
+        stateChanged(null, $state, true);
+      }
+      
+      override protected function stateChanged(oldState:String, newState:String, recursive:Boolean):void
+      {
+        //super.stateChanged(oldState, newState, recursive);
+        
+        var host: BitmapButton = hostComponent as BitmapButton;
+        if (host == null)
+          return;
+        
+        biUp.source       = host.srcUp;
+        biOver.source     = host.srcOver; 
+        biDown.source     = host.srcDown;
+        biDisabled.source = host.srcDisabled;
+        
+        switch (newState)
+        {
+          case "up":        biUp.source       = host.srcUp; show(biUp); break;
+          case "over":      
+            biOver.source     = host.srcOver; 
+            show(biOver); 
+            break;
+          case "down":      biDown.source     = host.srcDown; show(biDown); break;
+          case "disabled":  biDisabled.source = host.srcDisabled ; show(biDisabled); break;
+        }
+        
+        //conf::debug{at(arguments);}
+      }
+      
+    ]]>
+  </fx:Script>
+  
+  <!-- states -->
+  <s:states>
+    <s:State name="up"/>
+    <s:State name="over"/>
+    <s:State name="down"/>
+    <s:State name="disabled"/>
+  </s:states>
+  
+  <s:BitmapImage id="biUp" width="100%" height="100%" alwaysCreateDisplayObject="false" clearOnLoad="true" smooth="true" scaleMode="letterbox" horizontalAlign="center"/>
+  <s:BitmapImage id="biOver" width="100%" height="100%" alwaysCreateDisplayObject="false" clearOnLoad="true" smooth="true" scaleMode="letterbox" horizontalAlign="center"/>
+  <s:BitmapImage id="biDown" width="100%" height="100%" alwaysCreateDisplayObject="false" clearOnLoad="true" smooth="true" scaleMode="letterbox" horizontalAlign="center"/>
+  <s:BitmapImage id="biDisabled" width="100%" height="100%" alwaysCreateDisplayObject="false" clearOnLoad="true" smooth="true" scaleMode="letterbox" horizontalAlign="center"/>
 </s:SparkButtonSkin>

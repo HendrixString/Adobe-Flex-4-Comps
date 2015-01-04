@@ -1,57 +1,57 @@
 <?xml version="1.0" encoding="utf-8"?>
 <s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
-				 xmlns:s="library://ns.adobe.com/flex/spark" 
-				 xmlns:mx="library://ns.adobe.com/flex/mx" 
-				 width="100%" height="100%"
-				 creationComplete="onCreationCompleteHandler(event)">
-
-	<fx:Script>
-		<![CDATA[
-			import mx.events.FlexEvent;
-			
-			import spark.filters.DropShadowFilter;
-			
-			public function mrWeatherUpdate($day:String, $temp:String, $iconSource:Object):void
-			{
-				lblDay.text 					= $day;
-				lblTemp.text 					= $temp + String.fromCharCode(0x00b0);
-				bmpWeatherIcon.source = null;
-				bmpWeatherIcon.addEventListener(Event.COMPLETE, onBmpComplete);
-				bmpWeatherIcon.source = $iconSource;
-			}
-			
-			protected function onBmpComplete(event:Event = null):void
-			{
-				bmpWeatherIcon.width = bmpWeatherIcon.height = height*0.5;
-				
-			}
-			
-			protected function onCreationCompleteHandler(event:FlexEvent):void
-			{
-				if(bmpWeatherIcon != null)
-				 onBmpComplete();
-			}
-			
-		]]>
-	</fx:Script>
-	<s:VGroup width="100%" height="100%" gap="0">
-		
-		<s:Group width="100%" height="70%">
-			<s:BitmapImage source="@Embed('com/flexcomps/weatherComp/assets/day_small_title.png')"  width="100%" height="100%" scaleMode="stretch"/>
-			<s:BitmapImage source="@Embed('com/flexcomps/weatherComp/assets/title_shadow.png')" 		width="100%" height="100%" scaleMode="stretch"/>
-			<s:Label id="lblDay" text="day" color="#00589E" fontSize="22" right="8" verticalAlign="middle" verticalCenter="-1.5" fontFamily="FbSpoiler-Bold" filters="{[new spark.filters.DropShadowFilter(2,45,0,0.2)]}"/>
-		</s:Group>
-		
-		<s:Group width="100%" height="30%">
-			<s:BitmapImage source="@Embed('com/flexcomps/weatherComp/assets/day_small.png')"  width="100%" height="100%" scaleMode="stretch"/>
-			<s:BitmapImage source="@Embed('com/flexcomps/weatherComp/assets/title_shadow.png')" 		width="100%" height="100%" scaleMode="stretch"/>
-			<s:HGroup id="hgrp" width="100%" height="100%" horizontalAlign="center" verticalAlign="middle" filters="{[new spark.filters.DropShadowFilter(2,45,0,0.5)]}">
-				<s:BitmapImage id="bmpWeatherIcon" scaleMode="stretch" smooth="true" smoothingQuality="high" />
-				<s:RichText id="lblTemp" text="" color="#F9F9F9" fontSize="24" fontFamily="FbSpoiler-Bold"/>
-			</s:HGroup>
-		</s:Group>
-		
-		<s:BitmapImage source="@Embed('com/flexcomps/weatherComp/assets/day_small_down.png')"  width="100%" scaleMode="stretch"/>
-		
-	</s:VGroup>
+         xmlns:s="library://ns.adobe.com/flex/spark" 
+         xmlns:mx="library://ns.adobe.com/flex/mx" 
+         width="100%" height="100%"
+         creationComplete="onCreationCompleteHandler(event)">
+  
+  <fx:Script>
+    <![CDATA[
+      import mx.events.FlexEvent;
+      
+      import spark.filters.DropShadowFilter;
+      
+      public function mrWeatherUpdate($day:String, $temp:String, $iconSource:Object):void
+      {
+        lblDay.text           = $day;
+        lblTemp.text          = $temp + String.fromCharCode(0x00b0);
+        bmpWeatherIcon.source = null;
+        bmpWeatherIcon.addEventListener(Event.COMPLETE, onBmpComplete);
+        bmpWeatherIcon.source = $iconSource;
+      }
+      
+      protected function onBmpComplete(event:Event = null):void
+      {
+        bmpWeatherIcon.width = bmpWeatherIcon.height = height*0.5;
+        
+      }
+      
+      protected function onCreationCompleteHandler(event:FlexEvent):void
+      {
+        if(bmpWeatherIcon != null)
+          onBmpComplete();
+      }
+      
+    ]]>
+  </fx:Script>
+  <s:VGroup width="100%" height="100%" gap="0">
+    
+    <s:Group width="100%" height="70%">
+      <s:BitmapImage source="@Embed('com/flexcomps/weatherComp/assets/day_small_title.png')"  width="100%" height="100%" scaleMode="stretch"/>
+      <s:BitmapImage source="@Embed('com/flexcomps/weatherComp/assets/title_shadow.png')"     width="100%" height="100%" scaleMode="stretch"/>
+      <s:Label id="lblDay" text="day" color="#00589E" fontSize="22" right="8" verticalAlign="middle" verticalCenter="-1.5" fontFamily="FbSpoiler-Bold" filters="{[new spark.filters.DropShadowFilter(2,45,0,0.2)]}"/>
+    </s:Group>
+    
+    <s:Group width="100%" height="30%">
+      <s:BitmapImage source="@Embed('com/flexcomps/weatherComp/assets/day_small.png')"  width="100%" height="100%" scaleMode="stretch"/>
+      <s:BitmapImage source="@Embed('com/flexcomps/weatherComp/assets/title_shadow.png')"     width="100%" height="100%" scaleMode="stretch"/>
+      <s:HGroup id="hgrp" width="100%" height="100%" horizontalAlign="center" verticalAlign="middle" filters="{[new spark.filters.DropShadowFilter(2,45,0,0.5)]}">
+        <s:BitmapImage id="bmpWeatherIcon" scaleMode="stretch" smooth="true" smoothingQuality="high" />
+        <s:RichText id="lblTemp" text="" color="#F9F9F9" fontSize="24" fontFamily="FbSpoiler-Bold"/>
+      </s:HGroup>
+    </s:Group>
+    
+    <s:BitmapImage source="@Embed('com/flexcomps/weatherComp/assets/day_small_down.png')"  width="100%" scaleMode="stretch"/>
+    
+  </s:VGroup>
 </s:Group>

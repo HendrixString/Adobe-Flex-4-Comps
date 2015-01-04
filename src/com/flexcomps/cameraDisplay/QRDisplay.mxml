@@ -1,110 +1,107 @@
 <?xml version="1.0" encoding="utf-8"?>
 <comp:CameraDisplay xmlns:fx="http://ns.adobe.com/mxml/2009" 
-										xmlns:s="library://ns.adobe.com/flex/spark" 
-										xmlns:mx="library://ns.adobe.com/flex/mx" 
-										xmlns:comp="com.flexcomps.cameraDisplay.*" 
-										width="100%" height="100%">
-	<fx:Declarations>
-		<!-- Place non-visual elements (e.g., services, value objects) here -->
-	</fx:Declarations>
-	
-	<fx:Script>
-		<![CDATA[
-			import com.flexcomps.cameraDisplay.core.QRController;
-			
-			import mx.events.FlexEvent;
-			
-			private var _qController:						QRController	=	null;
-			
-			private var _onSuccessQR:						Function 			= null;
-			private var _onErrorQR:							Function 			= null;
-			
-			private var currentFrame:						uint					=	0;
-			
-			/**
-			 * relaxation for QR code reading
-			 */ 
-			public var scanEveryNumberOfFrames:		uint				=	15;
-			
-			override protected function onCreationCompleteHandler(event:FlexEvent):void
-			{
-				_qController										=	new QRController();
-				
-				_qController.onSuccessDetectQR	=	_onSuccessQR;
-				_qController.onFailedDetectQR		=	_onErrorQR;
-				
-				_qController.init();
-				
-				super.onCreationCompleteHandler(event);
-			}
-			
-			/**
-			 * Start the camera capture and QR reading 
-			 */ 
-			override public function start():void
-			{
-				super.start();
-				
-				_qController.startQRReading();
-			}
-			
-			/**
-			 * Stop the camera capture and QR reading 
-			 */ 
-			override public function stop():void
-			{
-				super.stop();
-				
-				_qController.stopQRReading();
-			}
-			
-			override protected function onNewVideoFrame(bm:BitmapData = null):void
-			{
-				super.onNewVideoFrame(bm);
-				
-				if(skipDetection() == false)
-					_qController.detectQR(_cController.cameraBufferWork.clone());
-				
-				//dsd.source	=	_cController.cameraBufferWork.clone();
-			}
-
-			/**
-			 * success QR code callback
-			 */
-			public function get onSuccessQR():								Function	{	return _onSuccessQR;	}
-			public function set onSuccessQR(value:Function):	void
-			{
-				_onSuccessQR = value;
-				
-				if(_qController)
-					_qController.onSuccessDetectQR	=	_onSuccessQR;
-			}
-
-			/**
-			 * error QR code callback
-			 */
-			public function get onErrorQR():									Function	{	return _onErrorQR;	}
-			public function set onErrorQR(value:Function):		void
-			{
-				_onErrorQR = value;
-				
-				if(_qController)
-					_qController.onFailedDetectQR	=	_onErrorQR;
-			}
-
-			private function skipDetection():Boolean
-			{
-				currentFrame += 1;
-				currentFrame 	= currentFrame % scanEveryNumberOfFrames;
-				
-				if(currentFrame != 0)
-					return true;
-				
-				return false;
-			}
-			
-		]]>
-	</fx:Script>
-	
-
+                    xmlns:s="library://ns.adobe.com/flex/spark" 
+                    xmlns:mx="library://ns.adobe.com/flex/mx" 
+                    xmlns:comp="com.flexcomps.cameraDisplay.*" 
+                    width="100%" height="100%">
+  <fx:Declarations>
+    <!-- Place non-visual elements (e.g., services, value objects) here -->
+  </fx:Declarations>
+  
+  <fx:Script>
+    <![CDATA[
+      import com.flexcomps.cameraDisplay.core.QRController;
+      
+      import mx.events.FlexEvent;
+      
+      private var _qController:						QRController	=	null;
+      
+      private var _onSuccessQR:						Function 			= null;
+      private var _onErrorQR:							Function 			= null;
+      
+      private var currentFrame:						uint					=	0;
+      
+      /**
+       * relaxation for QR code reading
+       */ 
+      public var scanEveryNumberOfFrames:		uint				=	15;
+      
+      override protected function onCreationCompleteHandler(event:FlexEvent):void
+      {
+        _qController										=	new QRController();
+        
+        _qController.onSuccessDetectQR	=	_onSuccessQR;
+        _qController.onFailedDetectQR		=	_onErrorQR;
+        
+        _qController.init();
+        
+        super.onCreationCompleteHandler(event);
+      }
+      
+      /**
+       * Start the camera capture and QR reading 
+       */ 
+      override public function start():void
+      {
+        super.start();
+        
+        _qController.startQRReading();
+      }
+      
+      /**
+       * Stop the camera capture and QR reading 
+       */ 
+      override public function stop():void
+      {
+        super.stop();
+        
+        _qController.stopQRReading();
+      }
+      
+      override protected function onNewVideoFrame(bm:BitmapData = null):void
+      {
+        super.onNewVideoFrame(bm);
+        
+        if(skipDetection() == false)
+          _qController.detectQR(_cController.cameraBufferWork.clone());
+        
+        //dsd.source	=	_cController.cameraBufferWork.clone();
+      }
+      /**
+       * success QR code callback
+       */
+      public function get onSuccessQR():								Function	{	return _onSuccessQR;	}
+      public function set onSuccessQR(value:Function):	void
+      {
+        _onSuccessQR = value;
+        
+        if(_qController)
+          _qController.onSuccessDetectQR	=	_onSuccessQR;
+      }
+      /**
+       * error QR code callback
+       */
+      public function get onErrorQR():									Function	{	return _onErrorQR;	}
+      public function set onErrorQR(value:Function):		void
+      {
+        _onErrorQR = value;
+        
+        if(_qController)
+          _qController.onFailedDetectQR	=	_onErrorQR;
+      }
+      private function skipDetection():Boolean
+      {
+        currentFrame += 1;
+        currentFrame 	= currentFrame % scanEveryNumberOfFrames;
+        
+        if(currentFrame != 0)
+          return true;
+        
+        return false;
+      }
+      
+    ]]>
+  </fx:Script>
+  
+  
 </comp:CameraDisplay>

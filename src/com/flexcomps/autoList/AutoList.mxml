@@ -1,263 +1,263 @@
 <?xml version="1.0" encoding="utf-8"?>
 <s:List xmlns:fx="http://ns.adobe.com/mxml/2009"
-				xmlns:s="library://ns.adobe.com/flex/spark" 
-				xmlns:mx="library://ns.adobe.com/flex/mx"
-				borderVisible="false" verticalScrollPolicy="off" horizontalScrollPolicy="off"
-				contentBackgroundAlpha="0" verticalCenter="0"
-				creationComplete="onListCreationCompleteHandler(event)">
-
-	<fx:Script>
-		<![CDATA[			
-			/**
-			 * AutoList <br>
-			 * Author: Tomer Shalev 
-			 * a list extension that scrolls automatically horizontally or vertically back and forth
-			 */ 
-			
-			import com.greensock.TweenLite;
-			
-			import mx.collections.IList;
-			import mx.core.FlexGlobals;
-			import mx.events.FlexEvent;
-			import mx.events.PropertyChangeEvent;
-			
-			import spark.components.DataGroup;
-			import spark.layouts.TileLayout;
-			
-			public static var LAYOUT_HORIZONTAL:				String	=	"LAYOUT_HORIZONTAL";
-			public static var LAYOUT_VERTICAL:					String	=	"LAYOUT_VERTICAL";
-			
-			public var GALLERY_TRANSITION_SEC:					uint;
-			public var GALLERY_TRANSITION_DELAY_SEC:		uint;
-			
-			private var _hDirection:										int			=	1;
-			private var _vDirection:										int			=	1;
-			
-			private var _layoutDesc:										String	=	null;
-
-			public var container:												Object	=	null;
-			private var second:Boolean=false;
-
-			public function setLayout($type:String = "LAYOUT_HORIZONTAL"):	void
-			{
-				//trace("setLayout");
-				var tLayout:	TileLayout				 =	new TileLayout();
-				this.layout.useVirtualLayout		 = false;
-				
-				tLayout.clipAndEnableScrolling	 =	true;
-				tLayout.horizontalGap						 =	0;	
-				tLayout.verticalGap							 =	0;	
-				
-				switch($type) {
-					case LAYOUT_HORIZONTAL:
-						_layoutDesc	=	LAYOUT_HORIZONTAL;
-						tLayout.requestedRowCount		  = 1;	
-						tLayout.columnWidth						=	width;
-						tLayout.rowHeight							=	height;
-						break;
-					case LAYOUT_VERTICAL:
-						_layoutDesc	=	LAYOUT_VERTICAL;
-						tLayout.requestedColumnCount = 1;	
-						tLayout.columnWidth						=	width;
-						break;
-				}
-				
-				layout	=	tLayout;
-			}
-			
-			public function roStartScroll($delay:uint	=	0):void
-			{
-				//trace("roStartScroll");
-				switch(_layoutDesc) {
-					case LAYOUT_HORIZONTAL:
-						scroller.viewport.horizontalScrollPosition	=	scroller.viewport.contentWidth - scroller.viewport.width;
-						validateNow();
-						//if(second == true)
-						//	return;
-						//second = true;
-						doHorizontalTransition($delay);
-						break;
-					case LAYOUT_VERTICAL:
-						doVerticalTransition();
-						break;
-				}
-			}
-			
-			override public function set dataProvider(value:IList):void
-			{
-				//trace("dataProvider");
-				var obj:Object	=	TweenLite.getTweensOf(scroller.viewport);
-				TweenLite.killTweensOf(scroller.viewport);
-				super.dataProvider	=	null;
-				super.dataProvider	=	value;
-				addEventListener(FlexEvent.UPDATE_COMPLETE, onListUpdateCompleteHandler);
-			}
-			
-			private function onListUpdateCompleteHandler(event:FlexEvent):void
-			{
-				//trace("onListUpdateCompleteHandler");
-				dataGroup.clipAndEnableScrolling					=	true;
-				scroller.viewport.clipAndEnableScrolling	=	true;
-				roStartScroll(GALLERY_TRANSITION_DELAY_SEC);
-			}
-			
-			private function doHorizontalTransition($delay:Number	=	0):void
-			{
-				//trace("doHorizontalTransition");
-				var scrollPosition:	uint	=	scroller.viewport.horizontalScrollPosition;
-				var contentWidth:		uint	=	scroller.viewport.contentWidth;
-				var viewPortWidth:	uint	=	scroller.viewport.width;
-				var hDelta:uint;
-				var newPos:int;
-				
-				if(contentWidth > 0)	{
-					removeEventListener(FlexEvent.UPDATE_COMPLETE, onListUpdateCompleteHandler);
-				}
-				else	{
-					return;
-				}
-				
-				if(_hDirection == -1) {
-					hDelta	=	Math.abs(contentWidth - scrollPosition);
-					newPos 	= Math.min(scrollPosition + viewPortWidth, contentWidth - viewPortWidth);
-					//trace(_hDirection);
-					//trace(scrollPosition);
-					//trace(newPos);
-					
-					if(newPos < 0)
-						newPos = 0;
-					if(newPos == (contentWidth - viewPortWidth))
-						_hDirection	*= -1;
-				}
-				else { //right to left
-					hDelta	=	Math.abs(scrollPosition);
-					newPos	= Math.max(scrollPosition - viewPortWidth, 0);
-					//if(newPos == 0)
-					//_hDirection	*= -1;
-					//trace("scrollPosition: " + scrollPosition + ", newPos: " + newPos);
-					
-					if((scrollPosition == 0)) {
-						roStartScroll(GALLERY_TRANSITION_DELAY_SEC);
-						return;
-						
-					}
-				}
-				
-				//trace("hDelta: "			+ hDelta);
-				//trace("_hDirection: "	+ _hDirection);
-				
-				var newScrollPosition:uint	=	newPos;
-				TweenLite.to(scroller.viewport, GALLERY_TRANSITION_SEC, {horizontalScrollPosition: newScrollPosition, onComplete:onHorizontalTransitionComplete, delay:$delay})
-			}
-			
-			private function doHorizontalTransitionBounce($delay:Number	=	0):void
-			{
-				var scrollPosition:	uint	=	scroller.viewport.horizontalScrollPosition;
-				var contentWidth:		uint	=	scroller.viewport.contentWidth;
-				var viewPortWidth:	uint	=	scroller.viewport.width;
-				var hDelta:uint;
-				var newPos:int;
-				
-				if(contentWidth > 0)	{
-					removeEventListener(FlexEvent.UPDATE_COMPLETE, onListUpdateCompleteHandler);
-				}
-				else	{
-					return;
-				}
-				
-				if(_hDirection == -1) {
-					hDelta	=	Math.abs(contentWidth - scrollPosition);
-					newPos 	= Math.min(scrollPosition + viewPortWidth, contentWidth - viewPortWidth);
-					//trace(_hDirection);
-					//trace(scrollPosition);
-					//trace(newPos);
-					
-					if(newPos < 0)
-						newPos = 0;
-					if(newPos == (contentWidth - viewPortWidth))
-						_hDirection	*= -1;
-				}
-				else { //right to left
-					hDelta	=	Math.abs(scrollPosition);
-					newPos	= Math.max(scrollPosition - viewPortWidth, 0);
-					if(newPos == 0)
-						_hDirection	*= -1;
-					//trace(scrollPosition);
-					//trace(newPos);
-					
-				}
-				
-				//trace("hDelta: "			+ hDelta);
-				//trace("_hDirection: "	+ _hDirection);
-				
-				var newScrollPosition:uint	=	newPos;
-				TweenLite.to(scroller.viewport, GALLERY_TRANSITION_SEC, {horizontalScrollPosition: newScrollPosition, onComplete:onHorizontalTransitionComplete, delay:$delay})
-			}
-			
-			private function onHorizontalTransitionComplete():void
-			{
-				//trace("onHorizontalTransitionComplete");
-				doHorizontalTransition(GALLERY_TRANSITION_DELAY_SEC);
-			}
-			
-			private function doVerticalTransition($delay:Number	=	0):void
-			{
-				var vScrollPosition:	uint	=	scroller.viewport.verticalScrollPosition;
-				var contentHeight:		uint	=	scroller.viewport.contentHeight;
-				var viewPortHeight:		uint	=	scroller.viewport.height;
-				var vDelta:uint;
-				var newPos:int;
-				
-				if(contentHeight > 0)	{
-					removeEventListener(FlexEvent.UPDATE_COMPLETE, onListUpdateCompleteHandler);
-				}
-				else	{
-					return;
-				}
-				
-				if(_vDirection == 1) {
-					vDelta	=	Math.abs(contentHeight - vScrollPosition);
-					newPos 	= Math.min(vScrollPosition + viewPortHeight, contentHeight - viewPortHeight);
-					if(newPos < 0)
-						newPos = 0;
-					if(newPos == (contentHeight - viewPortHeight))
-						_vDirection	*= -1;
-				}
-				else {
-					vDelta	=	Math.abs(vScrollPosition);
-					newPos	= Math.max(vScrollPosition - viewPortHeight, 0);
-					if(newPos == 0)
-						_vDirection	*= -1;
-				}
-				
-				//trace("vDelta: "			+ vDelta);
-				//trace("_vDirection: "	+ _vDirection);
-				
-				var newScrollPosition:uint	=	newPos;
-				TweenLite.to(scroller.viewport, GALLERY_TRANSITION_SEC, {verticalScrollPosition: newScrollPosition, onComplete:onVerticalTransitionComplete, delay:$delay})
-			}
-			
-			private function onVerticalTransitionComplete():void
-			{
-				doVerticalTransition(GALLERY_TRANSITION_DELAY_SEC);
-			}
-			
-			protected function onListCreationCompleteHandler(event:FlexEvent):void
-			{
-				//trace("onListCreationCompleteHandler");
-				setLayout(_layoutDesc);
-			}
-
-			/**
-			 * choose between <code>LAYOUT_HORIZONTAL, LAYOUT_VERTICAL</code>
-			 */ 
-			public function get layoutDesc():String	{	return _layoutDesc;	}
-			public function set layoutDesc(value:String):void	{
-				//trace("set layoutDesc");
-				_layoutDesc = value;
-			}
-						
-		]]>
-	</fx:Script>
-	
+        xmlns:s="library://ns.adobe.com/flex/spark" 
+        xmlns:mx="library://ns.adobe.com/flex/mx"
+        borderVisible="false" verticalScrollPolicy="off" horizontalScrollPolicy="off"
+        contentBackgroundAlpha="0" verticalCenter="0"
+        creationComplete="onListCreationCompleteHandler(event)">
+  
+  <fx:Script>
+    <![CDATA[     
+      /**
+       * AutoList <br>
+       * Author: Tomer Shalev 
+       * a list extension that scrolls automatically horizontally or vertically back and forth
+       */ 
+      
+      import com.greensock.TweenLite;
+      
+      import mx.collections.IList;
+      import mx.core.FlexGlobals;
+      import mx.events.FlexEvent;
+      import mx.events.PropertyChangeEvent;
+      
+      import spark.components.DataGroup;
+      import spark.layouts.TileLayout;
+      
+      public static var LAYOUT_HORIZONTAL:        String  = "LAYOUT_HORIZONTAL";
+      public static var LAYOUT_VERTICAL:          String  = "LAYOUT_VERTICAL";
+      
+      public var GALLERY_TRANSITION_SEC:          uint;
+      public var GALLERY_TRANSITION_DELAY_SEC:    uint;
+      
+      private var _hDirection:                    int     = 1;
+      private var _vDirection:                    int     = 1;
+      
+      private var _layoutDesc:                    String  = null;
+      
+      public var container:                       Object  = null;
+      private var second:Boolean=false;
+      
+      public function setLayout($type:String = "LAYOUT_HORIZONTAL"):  void
+      {
+        //trace("setLayout");
+        var tLayout:  TileLayout         =  new TileLayout();
+        this.layout.useVirtualLayout     = false;
+        
+        tLayout.clipAndEnableScrolling   =  true;
+        tLayout.horizontalGap            =  0;  
+        tLayout.verticalGap              =  0;  
+        
+        switch($type) {
+          case LAYOUT_HORIZONTAL:
+            _layoutDesc = LAYOUT_HORIZONTAL;
+            tLayout.requestedRowCount     = 1;  
+            tLayout.columnWidth           = width;
+            tLayout.rowHeight             = height;
+            break;
+          case LAYOUT_VERTICAL:
+            _layoutDesc = LAYOUT_VERTICAL;
+            tLayout.requestedColumnCount = 1; 
+            tLayout.columnWidth           = width;
+            break;
+        }
+        
+        layout  = tLayout;
+      }
+      
+      public function roStartScroll($delay:uint = 0):void
+      {
+        //trace("roStartScroll");
+        switch(_layoutDesc) {
+          case LAYOUT_HORIZONTAL:
+            scroller.viewport.horizontalScrollPosition  = scroller.viewport.contentWidth - scroller.viewport.width;
+            validateNow();
+            //if(second == true)
+            //  return;
+            //second = true;
+            doHorizontalTransition($delay);
+            break;
+          case LAYOUT_VERTICAL:
+            doVerticalTransition();
+            break;
+        }
+      }
+      
+      override public function set dataProvider(value:IList):void
+      {
+        //trace("dataProvider");
+        var obj:Object  = TweenLite.getTweensOf(scroller.viewport);
+        TweenLite.killTweensOf(scroller.viewport);
+        super.dataProvider  = null;
+        super.dataProvider  = value;
+        addEventListener(FlexEvent.UPDATE_COMPLETE, onListUpdateCompleteHandler);
+      }
+      
+      private function onListUpdateCompleteHandler(event:FlexEvent):void
+      {
+        //trace("onListUpdateCompleteHandler");
+        dataGroup.clipAndEnableScrolling          = true;
+        scroller.viewport.clipAndEnableScrolling  = true;
+        roStartScroll(GALLERY_TRANSITION_DELAY_SEC);
+      }
+      
+      private function doHorizontalTransition($delay:Number = 0):void
+      {
+        //trace("doHorizontalTransition");
+        var scrollPosition: uint  = scroller.viewport.horizontalScrollPosition;
+        var contentWidth:   uint  = scroller.viewport.contentWidth;
+        var viewPortWidth:  uint  = scroller.viewport.width;
+        var hDelta:uint;
+        var newPos:int;
+        
+        if(contentWidth > 0)  {
+          removeEventListener(FlexEvent.UPDATE_COMPLETE, onListUpdateCompleteHandler);
+        }
+        else  {
+          return;
+        }
+        
+        if(_hDirection == -1) {
+          hDelta  = Math.abs(contentWidth - scrollPosition);
+          newPos  = Math.min(scrollPosition + viewPortWidth, contentWidth - viewPortWidth);
+          //trace(_hDirection);
+          //trace(scrollPosition);
+          //trace(newPos);
+          
+          if(newPos < 0)
+            newPos = 0;
+          if(newPos == (contentWidth - viewPortWidth))
+            _hDirection *= -1;
+        }
+        else { //right to left
+          hDelta  = Math.abs(scrollPosition);
+          newPos  = Math.max(scrollPosition - viewPortWidth, 0);
+          //if(newPos == 0)
+          //_hDirection *= -1;
+          //trace("scrollPosition: " + scrollPosition + ", newPos: " + newPos);
+          
+          if((scrollPosition == 0)) {
+            roStartScroll(GALLERY_TRANSITION_DELAY_SEC);
+            return;
+            
+          }
+        }
+        
+        //trace("hDelta: "      + hDelta);
+        //trace("_hDirection: " + _hDirection);
+        
+        var newScrollPosition:uint  = newPos;
+        TweenLite.to(scroller.viewport, GALLERY_TRANSITION_SEC, {horizontalScrollPosition: newScrollPosition, onComplete:onHorizontalTransitionComplete, delay:$delay})
+      }
+      
+      private function doHorizontalTransitionBounce($delay:Number = 0):void
+      {
+        var scrollPosition: uint  = scroller.viewport.horizontalScrollPosition;
+        var contentWidth:   uint  = scroller.viewport.contentWidth;
+        var viewPortWidth:  uint  = scroller.viewport.width;
+        var hDelta:uint;
+        var newPos:int;
+        
+        if(contentWidth > 0)  {
+          removeEventListener(FlexEvent.UPDATE_COMPLETE, onListUpdateCompleteHandler);
+        }
+        else  {
+          return;
+        }
+        
+        if(_hDirection == -1) {
+          hDelta  = Math.abs(contentWidth - scrollPosition);
+          newPos  = Math.min(scrollPosition + viewPortWidth, contentWidth - viewPortWidth);
+          //trace(_hDirection);
+          //trace(scrollPosition);
+          //trace(newPos);
+          
+          if(newPos < 0)
+            newPos = 0;
+          if(newPos == (contentWidth - viewPortWidth))
+            _hDirection *= -1;
+        }
+        else { //right to left
+          hDelta  = Math.abs(scrollPosition);
+          newPos  = Math.max(scrollPosition - viewPortWidth, 0);
+          if(newPos == 0)
+            _hDirection *= -1;
+          //trace(scrollPosition);
+          //trace(newPos);
+          
+        }
+        
+        //trace("hDelta: "      + hDelta);
+        //trace("_hDirection: " + _hDirection);
+        
+        var newScrollPosition:uint  = newPos;
+        TweenLite.to(scroller.viewport, GALLERY_TRANSITION_SEC, {horizontalScrollPosition: newScrollPosition, onComplete:onHorizontalTransitionComplete, delay:$delay})
+      }
+      
+      private function onHorizontalTransitionComplete():void
+      {
+        //trace("onHorizontalTransitionComplete");
+        doHorizontalTransition(GALLERY_TRANSITION_DELAY_SEC);
+      }
+      
+      private function doVerticalTransition($delay:Number = 0):void
+      {
+        var vScrollPosition:  uint  = scroller.viewport.verticalScrollPosition;
+        var contentHeight:    uint  = scroller.viewport.contentHeight;
+        var viewPortHeight:   uint  = scroller.viewport.height;
+        var vDelta:uint;
+        var newPos:int;
+        
+        if(contentHeight > 0) {
+          removeEventListener(FlexEvent.UPDATE_COMPLETE, onListUpdateCompleteHandler);
+        }
+        else  {
+          return;
+        }
+        
+        if(_vDirection == 1) {
+          vDelta  = Math.abs(contentHeight - vScrollPosition);
+          newPos  = Math.min(vScrollPosition + viewPortHeight, contentHeight - viewPortHeight);
+          if(newPos < 0)
+            newPos = 0;
+          if(newPos == (contentHeight - viewPortHeight))
+            _vDirection *= -1;
+        }
+        else {
+          vDelta  = Math.abs(vScrollPosition);
+          newPos  = Math.max(vScrollPosition - viewPortHeight, 0);
+          if(newPos == 0)
+            _vDirection *= -1;
+        }
+        
+        //trace("vDelta: "      + vDelta);
+        //trace("_vDirection: " + _vDirection);
+        
+        var newScrollPosition:uint  = newPos;
+        TweenLite.to(scroller.viewport, GALLERY_TRANSITION_SEC, {verticalScrollPosition: newScrollPosition, onComplete:onVerticalTransitionComplete, delay:$delay})
+      }
+      
+      private function onVerticalTransitionComplete():void
+      {
+        doVerticalTransition(GALLERY_TRANSITION_DELAY_SEC);
+      }
+      
+      protected function onListCreationCompleteHandler(event:FlexEvent):void
+      {
+        //trace("onListCreationCompleteHandler");
+        setLayout(_layoutDesc);
+      }
+      
+      /**
+       * choose between <code>LAYOUT_HORIZONTAL, LAYOUT_VERTICAL</code>
+       */ 
+      public function get layoutDesc():String { return _layoutDesc; }
+      public function set layoutDesc(value:String):void {
+        //trace("set layoutDesc");
+        _layoutDesc = value;
+      }
+      
+    ]]>
+  </fx:Script>
+  
 </s:List>

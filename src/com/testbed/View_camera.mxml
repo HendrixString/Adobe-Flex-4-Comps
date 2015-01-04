@@ -1,43 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
 <s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
-		 xmlns:s="library://ns.adobe.com/flex/spark" 
-		 xmlns:mx="library://ns.adobe.com/flex/mx" width="100%" height="100%"
-		 xmlns:cameraDisplay="com.flexcomps.cameraDisplay.*"
-		 creationComplete="onCreationCompleteHandler(event)"  
-		 >
-	
-	<fx:Script>
-		<![CDATA[
-			import com.flexcomps.splineContour.SplineContour;
-			
-			import mx.events.FlexEvent;
-			
-			protected function onCreationCompleteHandler(event:FlexEvent):void
-			{
-				qrDisplay.onSuccessQR = onSuccessQR;
-				qrDisplay.onErrorQR 	= onErrorQR;
-			}
-			
-			protected function onSuccessQR(res:Object = null):void
-			{
-				lblQR.text = "QR Code detected: " + res.toString();
-			}
-			
-			protected function onErrorQR(res:Object = null):void
-			{
-			}
-			
-			protected function camera_onUpdate(obj:Object = null):void
-			{
-				trace(obj.toString());
-			}
-
-		]]>
-	</fx:Script>
-	
-	<s:VGroup width="100%" height="100%" top="55">
-		<cameraDisplay:QRDisplay id="qrDisplay" width="33%" height="33%" horizontalCenter="0" scaleMode="zoom" startCapture="true" onCameraUpdate="{camera_onUpdate}"/>
-		<s:Label id="lblQR" width="25%" text="QRCODE" />
-		<cameraDisplay:CameraDisplay id="camDisplay" width="33%" height="33%" horizontalCenter="0" scaleMode="zoom" startCapture="true" onCameraUpdate="{camera_onUpdate}"/>
-	</s:VGroup>
+         xmlns:s="library://ns.adobe.com/flex/spark" 
+         xmlns:mx="library://ns.adobe.com/flex/mx" width="100%" height="100%"
+         xmlns:cameraDisplay="com.flexcomps.cameraDisplay.*"
+         creationComplete="onCreationCompleteHandler(event)"  
+         >
+  
+  <fx:Script>
+    <![CDATA[
+      import com.flexcomps.splineContour.SplineContour;
+      
+      import mx.events.FlexEvent;
+      
+      protected function onCreationCompleteHandler(event:FlexEvent):void
+      {
+        qrDisplay.onSuccessQR = onSuccessQR;
+        qrDisplay.onErrorQR   = onErrorQR;
+      }
+      
+      protected function onSuccessQR(res:Object = null):void
+      {
+        lblQR.text = "QR Code detected: " + res.toString();
+      }
+      
+      protected function onErrorQR(res:Object = null):void
+      {
+      }
+      
+      protected function camera_onUpdate(obj:Object = null):void
+      {
+        trace(obj.toString());
+      }
+      
+    ]]>
+  </fx:Script>
+  
+  <s:VGroup width="100%" height="100%" top="55">
+    <cameraDisplay:QRDisplay id="qrDisplay" width="33%" height="33%" horizontalCenter="0" scaleMode="zoom" startCapture="true" onCameraUpdate="{camera_onUpdate}"/>
+    <s:Label id="lblQR" width="25%" text="QRCODE" />
+    <cameraDisplay:CameraDisplay id="camDisplay" width="33%" height="33%" horizontalCenter="0" scaleMode="zoom" startCapture="true" onCameraUpdate="{camera_onUpdate}"/>
+  </s:VGroup>
 </s:Group>
