@@ -14,24 +14,24 @@
       
       import mx.events.FlexEvent;
       
-      private var _qController:						QRController	=	null;
+      private var _qController:           QRController  = null;
       
-      private var _onSuccessQR:						Function 			= null;
-      private var _onErrorQR:							Function 			= null;
+      private var _onSuccessQR:           Function      = null;
+      private var _onErrorQR:             Function      = null;
       
-      private var currentFrame:						uint					=	0;
+      private var currentFrame:           uint          = 0;
       
       /**
        * relaxation for QR code reading
        */ 
-      public var scanEveryNumberOfFrames:		uint				=	15;
+      public var scanEveryNumberOfFrames:   uint        = 15;
       
       override protected function onCreationCompleteHandler(event:FlexEvent):void
       {
-        _qController										=	new QRController();
+        _qController                    = new QRController();
         
-        _qController.onSuccessDetectQR	=	_onSuccessQR;
-        _qController.onFailedDetectQR		=	_onErrorQR;
+        _qController.onSuccessDetectQR  = _onSuccessQR;
+        _qController.onFailedDetectQR   = _onErrorQR;
         
         _qController.init();
         
@@ -65,34 +65,34 @@
         if(skipDetection() == false)
           _qController.detectQR(_cController.cameraBufferWork.clone());
         
-        //dsd.source	=	_cController.cameraBufferWork.clone();
+        //dsd.source  = _cController.cameraBufferWork.clone();
       }
       /**
        * success QR code callback
        */
-      public function get onSuccessQR():								Function	{	return _onSuccessQR;	}
-      public function set onSuccessQR(value:Function):	void
+      public function get onSuccessQR():                Function  { return _onSuccessQR;  }
+      public function set onSuccessQR(value:Function):  void
       {
         _onSuccessQR = value;
         
         if(_qController)
-          _qController.onSuccessDetectQR	=	_onSuccessQR;
+          _qController.onSuccessDetectQR  = _onSuccessQR;
       }
       /**
        * error QR code callback
        */
-      public function get onErrorQR():									Function	{	return _onErrorQR;	}
-      public function set onErrorQR(value:Function):		void
+      public function get onErrorQR():                  Function  { return _onErrorQR;  }
+      public function set onErrorQR(value:Function):    void
       {
         _onErrorQR = value;
         
         if(_qController)
-          _qController.onFailedDetectQR	=	_onErrorQR;
+          _qController.onFailedDetectQR = _onErrorQR;
       }
       private function skipDetection():Boolean
       {
         currentFrame += 1;
-        currentFrame 	= currentFrame % scanEveryNumberOfFrames;
+        currentFrame  = currentFrame % scanEveryNumberOfFrames;
         
         if(currentFrame != 0)
           return true;
