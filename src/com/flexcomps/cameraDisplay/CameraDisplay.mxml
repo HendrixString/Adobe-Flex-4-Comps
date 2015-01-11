@@ -37,6 +37,21 @@
        */ 
       public var scaleMode:       String            = ZOOM;
       
+			protected var _streamW:			uint 							= 1024;
+			protected var _streamH:			uint 							= 1024;
+			
+			public function get streamH():uint	{	return _streamH;	}
+			public function set streamH(value:uint):void
+			{
+				_streamH = value;
+			}
+
+			public function get streamW():uint	{	return _streamW;	}
+			public function set streamW(value:uint):void
+			{
+				_streamW = value;
+			}
+
       private var _onCameraUpdate:  Function          = null;
       
       /**
@@ -61,6 +76,8 @@
         
         _cController.onCameraUpdate   = _onCameraUpdate;
         _cController.onNewVideoFrame  = onNewVideoFrame;
+				_cController.streamW					=	_streamW;
+				_cController.streamH					=	_streamH;
         
         _cController.init();
         

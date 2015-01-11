@@ -24,8 +24,8 @@ package com.flexcomps.cameraDisplay.core
     protected var _camera:                Camera                    = null;
     
     protected var _streamFPS:             int                       = 15;
-    protected var _streamW:               int                       = 1024;
-    protected var _streamH:               int                       = 1024;
+    protected var _streamW:               int                       = 512;
+    protected var _streamH:               int                       = 512;
     protected var _workW:                 int                       = 0;
     protected var _workH:                 int                       = 0;
     protected var _downScaleRatio:        Number                    = 0.33;
