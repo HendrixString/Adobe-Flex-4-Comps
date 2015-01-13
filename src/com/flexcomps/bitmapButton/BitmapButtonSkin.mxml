@@ -84,6 +84,11 @@
         if (host == null)
           return;
         
+				biUp.scaleMode = host.scaleMode;
+				biOver.scaleMode = host.scaleMode;
+				biDown.scaleMode = host.scaleMode;
+				biDisabled.scaleMode = host.scaleMode;
+
         biUp.source       = host.srcUp;
         biOver.source     = host.srcOver; 
         biDown.source     = host.srcDown;

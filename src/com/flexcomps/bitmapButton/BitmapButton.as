@@ -3,6 +3,8 @@ package com.flexcomps.bitmapButton
   
   import com.flexcomps.bitmapButton.BitmapButtonSkin;
   
+  import org.osmf.layout.ScaleMode;
+  
   import spark.components.Button;
   
   public class BitmapButton extends Button
@@ -11,7 +13,8 @@ package com.flexcomps.bitmapButton
     private var _srcUp:       Object;
     private var _srcOver:     Object;
     private var _srcDisabled: Object;
-    
+		private var _scaleMode:String = ScaleMode.STRETCH;
+
     public function BitmapButton()
     {
       super();
@@ -26,6 +29,12 @@ package com.flexcomps.bitmapButton
       autoRepeat = false;
     }
     
+		public function get scaleMode():String {	return _scaleMode;	}
+		public function set scaleMode(value:String):void
+		{
+			_scaleMode = value;
+		}
+
     public function get srcDown(): Object {
       return _srcDown;
     }
