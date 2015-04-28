@@ -37,4 +37,6 @@ this comp is responsive and can fit itself wisely for a veriaty of dimensions.
 8. <b>VirtualKeyboard</b><br>
 a touch pad like virtual keyboard
 
+### Contact
+[tomer.shalev@gmail.com](tomer.shalev@gmail.com)
 
