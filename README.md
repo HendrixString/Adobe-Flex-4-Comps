@@ -38,8 +38,7 @@ this comp is responsive and can fit itself wisely for a veriaty of dimensions.
 a touch pad like virtual keyboard
 
 ### Dependencies
-* [`Starling-Framework`](https://github.com/Gamua/Starling-Framework)
-* [`Feathers`](https://github.com/joshtynjala/feathers)
+*
 
 ### Terms
 * completely free source code. [Apache License, Version 2.0.](http://www.apache.org/licenses/LICENSE-2.0)
