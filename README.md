@@ -37,6 +37,15 @@ this comp is responsive and can fit itself wisely for a veriaty of dimensions.
 8. <b>VirtualKeyboard</b><br>
 a touch pad like virtual keyboard
 
-### Contact
-[tomer.shalev@gmail.com](tomer.shalev@gmail.com)
+### Dependencies
+* [`Starling-Framework`](https://github.com/Gamua/Starling-Framework)
+* [`Feathers`](https://github.com/joshtynjala/feathers)
 
+### Terms
+* completely free source code. [Apache License, Version 2.0.](http://www.apache.org/licenses/LICENSE-2.0)
+* if you like it -> star or share it with others
+
+### Contact Author
+* [tomer.shalev@gmail.com](tomer.shalev@gmail.com)
+* [Google+ TomershalevMan](https://plus.google.com/+TomershalevMan/about)
+* [Facebook - HendrixString](https://www.facebook.com/HendrixString)
